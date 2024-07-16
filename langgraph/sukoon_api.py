@@ -6,7 +6,7 @@ import json
 from langgraph.graph import StateGraph, END
 
 # Import necessary functions and classes from Sukoon project
-from sukoon.ipynb import (
+from sukoon import (
     AgentState,
     run_planner_agent,
     execute_search,
@@ -30,10 +30,12 @@ class SukoonResponse(BaseModel):
 
 # Create and compile the graph
 graph = StateGraph(AgentState)
+
 graph.add_node("planner_agent", run_planner_agent)
 graph.add_node("search", execute_search)
 graph.add_node("error", handle_error)
 graph.add_node("rag_final_answer", rag_final_answer)
+
 graph.set_entry_point("planner_agent")
 graph.add_conditional_edges(
     "planner_agent",
@@ -68,4 +70,4 @@ async def root():
     return {"message": "Welcome to the Sukoon API. Use the /query endpoint to interact with the system."}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8000)

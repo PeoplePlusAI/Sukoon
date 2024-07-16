@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
 import json
+from typing import List, Optional, Dict, Any
+from pprint import pformat
 from langgraph.graph import StateGraph, END
 from langgraph.graph import StateGraph, END
 
@@ -39,6 +41,8 @@ class SukoonRequest(BaseModel):
 class SukoonResponse(BaseModel):
     answer: str
     source: str
+    intermediate_steps: List[Dict[str, Any]]
+    full_output: Dict[str, Any]
 
 # Create and compile the graph
 
@@ -77,10 +81,37 @@ async def process_query(request: SukoonRequest):
             "intermediate_steps": request.intermediate_steps
         })
         result = json.loads(out["agent_out"])
-        return SukoonResponse(answer=result["answer"], source=result["source"])
+        # Format the full output
+        formatted_output = json.loads(json.dumps(out, indent=2, default=str))
+        # Extract and format intermediate steps
+        intermediate_steps = [
+            {step: pformat(details, indent=2)} 
+            for step_dict in out.get("intermediate_steps", [])
+            for step, details in step_dict.items()
+        ]
+        return SukoonResponse(
+            answer=result["answer"],
+            source=result["source"],
+            intermediate_steps=intermediate_steps,
+            full_output=formatted_output
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+'''
+# printing in nice format
+import pprint
+
+text = json.dumps(out["agent_out"], indent = 2)
+output_text = {
+    "agent_out": {text}
+}
+
+final_output = json.loads(out["agent_out"])
+print(json.dumps(final_output, indent=2))
+# to see intermediate steps 
+pprint.pprint(out, indent = 4)
+'''
 @app.get("/")
 async def root():
     return {"message": "Welcome to the Sukoon API. Use the /query endpoint to interact with the system."}

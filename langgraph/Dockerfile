@@ -1,37 +1,26 @@
 # Use an official Python runtime as a parent image
 FROM python:3.10-slim
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3-dev \
-    graphviz \
-    libgraphviz-dev \
-    pkg-config \
-    git \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# Install Python dependencies
+# Install any needed packages specified in requirements.txt
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Jupyter
-RUN pip install --no-cache-dir jupyter
+# Install additional system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the entire project into the container
-COPY . .
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
 
-# Expose port 8888 for Jupyter Notebook
-EXPOSE 8888
+# Define environment variable
+# ENV NAME World
 
-# Set environment variable for OpenAI API key
-# In production, we'll use secrets management instead of hardcoding
-ENV OPENAI_API_KEY=${OPENAI_API_KEY}
-
-# Start Jupyter Notebook
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+# Run sukoon_api.py when the container launches
+CMD ["uvicorn", "sukoon_api:app", "--host", "0.0.0.0", "--port", "8000"]

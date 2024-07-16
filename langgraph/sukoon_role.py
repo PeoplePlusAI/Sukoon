@@ -120,12 +120,11 @@ prompt_text = "You are an empathetic and supportive AI agent designed to provide
               "Key Responsibilities:\n" \
               "- Engage in empathetic, personalized interactions that feel human-like and relatable\n" \
               "- Provide clear, accurate information about various mental health conditions and supportive strategies\n" \
-              "- Guide users through interactive scenarios to build practical skills in a safe virtual environment\n" \
+              "- Guide users through interactive scenarios to build practical skills in a safe virtual environment. You may engage in role play to achieve this like showing a conversation between a father trying to help her distressed daughter \n" \
               "- Offer reassurance, validation and appreciation to users as they share their experiences and concerns\n" \
               "- Paraphrase user statements to confirm understanding, ending with validation checks (e.g. \"Did I understand that correctly?\")\n" \
               "- Ask clarifying questions to gather relevant context; do not make assumptions about the user's situation\n" \
               "- Tailor guidance to each user's unique circumstances, while reinforcing best practices in mental health first aid\n" \
-              "- Maintain appropriate boundaries as an AI; direct users to professional help when needed\n" \
               "- Foster a non-judgmental, supportive tone that helps users feel heard and empowered to help their loved ones\n" \
               "Remember, your goal is to enhance understanding, improve communication skills, and ultimately enable users to create a more supportive environment for those struggling with mental health issues. Approach each interaction with compassion, respect for individual experiences, and a commitment to providing reliable, constructive guidance. Together, we can make a meaningful difference in the lives of individuals and families navigating mental health challenges."
 
@@ -215,43 +214,43 @@ def handle_error(state: list):
     return {"agent_out": function_call}
 
 
-# graph part 
+# # graph part 
 
-from langgraph.graph import StateGraph, END
+# from langgraph.graph import StateGraph, END
 
-graph = StateGraph(AgentState)
+# graph = StateGraph(AgentState)
 
-graph.add_node("planner_agent", run_planner_agent)
-graph.add_node("search", execute_search)
-graph.add_node("role_play", execute_role_play)  # Add the new node
-graph.add_node("error", handle_error)
-graph.add_node("rag_final_answer", rag_final_answer)
+# graph.add_node("planner_agent", run_planner_agent)
+# graph.add_node("search", execute_search)
+# graph.add_node("role_play", execute_role_play)  # Add the new node
+# graph.add_node("error", handle_error)
+# graph.add_node("rag_final_answer", rag_final_answer)
 
-graph.set_entry_point("planner_agent")
+# graph.set_entry_point("planner_agent")
 
-graph.add_conditional_edges(
-    "planner_agent",
-    router,
-    {
-        "search": "search",
-        "role_play": "role_play",  # Add the new edge
-        "error": "error",
-        "final_answer": END
-    }
-)
-graph.add_edge("search", "rag_final_answer")
-graph.add_edge("role_play", "rag_final_answer")  # Add edge from role_play to final answer
-graph.add_edge("error", END)
-graph.add_edge("rag_final_answer", END)
+# graph.add_conditional_edges(
+#     "planner_agent",
+#     router,
+#     {
+#         "search": "search",
+#         "role_play": "role_play",  # Add the new edge
+#         "error": "error",
+#         "final_answer": END
+#     }
+# )
+# graph.add_edge("search", "rag_final_answer")
+# graph.add_edge("role_play", "rag_final_answer")  # Add edge from role_play to final answer
+# graph.add_edge("error", END)
+# graph.add_edge("rag_final_answer", END)
 
-runnable = graph.compile()
+# runnable = graph.compile()
 
-out = runnable.invoke({
-    "input": "I want to help my daughter who is feeling depressed. Perform role play and tell me how should I help her. You can output a dialogue between a father and daughter to show that",
-    "intermediate_steps": []
-})
+# out = runnable.invoke({
+#     "input": "I want to help my daughter who is feeling depressed. Perform role play and tell me how should I help her. You can output a dialogue between a father and daughter to show that",
+#     "intermediate_steps": []
+# })
 
-print(out["agent_out"])
+# print(out["agent_out"])
 
 # import pprint
 

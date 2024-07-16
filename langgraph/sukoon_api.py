@@ -59,7 +59,6 @@ async def process_query(request: SukoonRequest):
             "input": request.input,
             "intermediate_steps": request.intermediate_steps
         })
-        
         result = json.loads(out["agent_out"])
         return SukoonResponse(answer=result["answer"], source=result["source"])
     except Exception as e:

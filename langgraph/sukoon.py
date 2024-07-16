@@ -3,17 +3,6 @@ from typing import TypedDict, Annotated, List, Union
 from langchain_core.agents import AgentAction, AgentFinish
 import operator
 
-class AgentState(TypedDict):
-    input: str # accepts user's input as string
-    agent_out : Union[AgentAction, AgentFinish, None] # gives output
-    intermediate_steps: Annotated[List[tuple[AgentAction, str]], operator.add] # shows intermediate steps
-
-
-# In[2]:
-
-with open("prompts/sample_data.txt", 'r') as file:
-    data = file.read().strip()
-
 import os.path
 import logging
 import sys
@@ -31,9 +20,15 @@ _ = load_dotenv(find_dotenv())
 openai_api_key = os.getenv("OPENAI_API_KEY")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 
+class AgentState(TypedDict):
+    input: str # accepts user's input as string
+    agent_out : Union[AgentAction, AgentFinish, None] # gives output
+    intermediate_steps: Annotated[List[tuple[AgentAction, str]], operator.add] # shows intermediate steps
 
-# In[5]:
+# In[2]:
 
+with open("prompts/sample_data.txt", 'r') as file:
+    data = file.read().strip()
 
 # llama-index function
 def llama_index(query: str):

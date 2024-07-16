@@ -4,5 +4,6 @@ langchain-core==0.1.42
 langgraph==0.0.37
 langchainhub==0.1.15
 pygraphviz==1.12
+llama-index
 fastapi
 uvicorn

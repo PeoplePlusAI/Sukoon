@@ -1,3 +1,4 @@
+from openai import OpenAI
 from typing import TypedDict, Annotated, List, Union
 
 from langchain_core.agents import AgentAction, AgentFinish
@@ -74,6 +75,27 @@ def final_answer_tool(
     """
     return ""
 
+### Role playing part
+@tool("role_play")
+def role_play_tool(query: str):
+    """Performs a role-play scenario for mental health first aid using AI."""
+    return chat_completion(query)
+
+
+def chat_completion(query):
+    client = OpenAI(api_key=openai_api_key)
+    prompt_text = """You are an empathetic AI trained to perform role-play scenarios for mental health first aid. Given a situation, you will output a constructive dialogue showing how to provide effective support. Your responses should be compassionate, informative, and tailored to the specific scenario. For example, if asked about helping a daughter feeling suicidal, you'll demonstrate a supportive conversation between a parent and child, emphasizing active listening, validation of feelings, and appropriate steps for seeking professional help."""
+
+    response = client.chat.completions.create(
+        model="gpt-4",  # Using GPT-4 for more nuanced responses
+        messages=[
+            {"role": "system", "content": prompt_text},
+            {"role": "user", "content": query}
+        ],
+        temperature=0.7  # Slightly increased for more creative responses
+    )
+    return response.choices[0].message.content
+
 
 import os
 from langchain.agents import create_openai_tools_agent
@@ -116,7 +138,7 @@ prompt = ChatPromptTemplate.from_messages([
 
 planner_agent_runnable = create_openai_tools_agent(
     llm=llm,
-    tools=[final_answer_tool, search_tool],
+    tools=[final_answer_tool, search_tool, role_play_tool],
     prompt=prompt
 )
 
@@ -139,10 +161,22 @@ def execute_search(state: list):
     )
     return {"intermediate_steps": [{"search": str(out)}]}
 
+def execute_role_play(state: list):
+    print("> execute_role_play")
+    action = state["agent_out"]
+    tool_call = action[-1].message_log[-1].additional_kwargs["tool_calls"][-1]
+    out = role_play_tool.invoke(
+        json.loads(tool_call["function"]["arguments"])
+    )
+    return {"intermediate_steps": [{"role_play": str(out)}]}
+
 def router(state: list):
     print("> router")
     if isinstance(state["agent_out"], list) and state["agent_out"]:
-        return state["agent_out"][-1].tool
+        tool = state["agent_out"][-1].tool
+        if "role play" in state["input"].lower() or tool == "role_play":
+            return "role_play"
+        return tool
     else:
         return "error"
 
@@ -181,19 +215,51 @@ def handle_error(state: list):
     return {"agent_out": function_call}
 
 
-'''
-def chat_completion(query):
-    prompt_text = "You have to act like a role playing bot.  Given a situation you will have to output a constructive dialogue on how to provide mental health first aid. eg if user says I've help my daughter who's feeling suicidal. You'll output a healthy conversation that shows supportive dad helping their daughter "
+# graph part 
 
-    client = OpenAI()
+from langgraph.graph import StateGraph, END
 
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": prompt_text},
-            {"role": "user", "content": query}
-        ]
-    )
-    return completion.choices[0].message
-'''
+graph = StateGraph(AgentState)
+
+graph.add_node("planner_agent", run_planner_agent)
+graph.add_node("search", execute_search)
+graph.add_node("role_play", execute_role_play)  # Add the new node
+graph.add_node("error", handle_error)
+graph.add_node("rag_final_answer", rag_final_answer)
+
+graph.set_entry_point("planner_agent")
+
+graph.add_conditional_edges(
+    "planner_agent",
+    router,
+    {
+        "search": "search",
+        "role_play": "role_play",  # Add the new edge
+        "error": "error",
+        "final_answer": END
+    }
+)
+graph.add_edge("search", "rag_final_answer")
+graph.add_edge("role_play", "rag_final_answer")  # Add edge from role_play to final answer
+graph.add_edge("error", END)
+graph.add_edge("rag_final_answer", END)
+
+runnable = graph.compile()
+
+out = runnable.invoke({
+    "input": "I want to help my daughter who is feeling depressed. Perform role play and tell me how should I help her. You can output a dialogue between a father and daughter to show that",
+    "intermediate_steps": []
+})
+
+print(out["agent_out"])
+
+# import pprint
+
+# text = json.dumps(out["agent_out"], indent = 2)
+# output_text = {
+#     "agent_out": {text}
+# }
+
+# final_output = json.loads(out["agent_out"])
+# print(json.dumps(final_output, indent=2))
 

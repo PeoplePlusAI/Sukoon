@@ -70,3 +70,20 @@ async def root():
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+    
+
+# example POST request to http://127.0.0.1:8000/query
+'''
+{
+  "input": "what I should do in providing immediate care?",
+  "intermediate_steps": []
+}
+'''
+
+'''
+Output - 
+{
+    "answer": "In providing immediate care for mental health first aid, you should offer a humane and supportive response to individuals experiencing distress. This involves providing immediate help until professional assistance is available or the crisis is resolved. Approach the individual with care, empathy, and respect, allowing them to open up at their own pace without pressuring them to share their story. This type of care is accessible to everyone and not limited to mental health professionals, addressing short-term crises and everyday stressors in a community-based and easily accessible manner.",
+    "source": "search"
+}
+'''

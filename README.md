@@ -3,6 +3,12 @@
 # Vision
 We want to build open-source solutions and standards for using AI to solve mental health challenges. The goal is to apply DPI knowledge and practices that can help professionals deeply explore and understand the latest advancements in AI and how they can be applied to use-cases in mental health specific to India. 
 
+# Steps to run
+```
+- Go to langgraph subfolder ( cd langgraph from terminal)
+- run 'python sukoon_api_1.py' after installing all dependencies in your environment (pip install -r requirements.txt)
+- go to sukoon-frontend(cd sukoon-frontend), run 'npm start' to access it in your browser
+```
 # Current Landscape
 Currently availing mental health has a lot of issues such as:
 Stigma -  In India, mental health issues are not considered as healthcare issues. Any person suffering from mental issues is considered weak. Stigma and discrimination often undermine social support structures. Persons suffering from such issues are often tagged as ‘lunatics’ by society. This leads to a vicious cycle of shame, suffering and isolation of the patients.

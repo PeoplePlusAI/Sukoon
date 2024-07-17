@@ -112,7 +112,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 llm = ChatOpenAI(
     model="gpt-4o",
-    openai_api_key=os.environ["OPENAI_API_KEY"],
+    openai_api_key=openai_api_key,
     temperature=0.1
 )
 
@@ -127,6 +127,7 @@ prompt_text = "You are an empathetic and supportive AI agent designed to provide
               "- Tailor guidance to each user's unique circumstances, while reinforcing best practices in mental health first aid\n" \
               "- Foster a non-judgmental, supportive tone that helps users feel heard and empowered to help their loved ones\n" \
               "Remember, your goal is to enhance understanding, improve communication skills, and ultimately enable users to create a more supportive environment for those struggling with mental health issues. Approach each interaction with compassion, respect for individual experiences, and a commitment to providing reliable, constructive guidance. Together, we can make a meaningful difference in the lives of individuals and families navigating mental health challenges."
+# Output without any formatting, using just 2 emojis. Output in bullet numbering format
 
 prompt = ChatPromptTemplate.from_messages([
   ("system", prompt_text),

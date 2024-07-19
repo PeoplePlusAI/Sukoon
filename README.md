@@ -5,7 +5,7 @@ We want to build open-source solutions and standards for using AI to solve menta
 
 # Steps to run
 ```
-- Go to langgraph subfolder ( cd langgraph) from terminal
+- Go to main subfolder ( cd main) from terminal as this is the main folder
 - run 'python sukoon_api_1.py' after installing all dependencies in your environment (pip install -r requirements.txt)
 - go to sukoon-frontend(cd sukoon-frontend), run 'npm start' to access it in your browser.
 - alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app

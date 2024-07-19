@@ -170,6 +170,59 @@ def execute_role_play(state: list):
     )
     return {"intermediate_steps": [{"role_play": str(out)}]}
 
+import re
+
+# def router(state: dict):
+#     print("> router")
+#     input_text = state["input"].lower()
+    
+#     # Keywords that might indicate a need for role play
+#     role_play_keywords = [
+#         "role play", "scenario", "simulate", "practice", "conversation",
+#         "dialogue", "interact", "pretend", "act out", "example situation"
+#     ]
+    
+#     # Keywords that indicate a request for mental health first aid information
+#     mhfa_keywords = [
+#         "mental health first aid", "mhfa", "first aid for mental health",
+#         "mental health support", "mental health assistance",
+#         "how to help someone with mental health", "mental health crisis",
+#         "mental health emergency", "mental health intervention"
+#     ]
+    
+#     # Check if the input is asking for mental health first aid information
+#     if any(keyword in input_text for keyword in mhfa_keywords):
+#         return "search"
+    
+#     # Check if any role play keywords are in the input
+#     if any(keyword in input_text for keyword in role_play_keywords):
+#         return "role_play"
+    
+#     # Check if the input is asking for help with a specific situation
+#     if re.search(r"how (should|can|do) I (help|deal with|handle|approach)", input_text):
+#         return "role_play"
+    
+#     # If the agent output exists and is a list
+#     if isinstance(state["agent_out"], list) and state["agent_out"]:
+#         tool = state["agent_out"][-1].tool
+        
+#         # If the agent explicitly chose role_play
+#         if tool == "role_play":
+#             return "role_play"
+        
+#         # If the agent chose search, but the content might benefit from role play
+#         if tool == "search":
+#             action = state["agent_out"][-1]
+#             if hasattr(action, 'tool_input'):
+#                 tool_input = action.tool_input.lower()
+#                 if any(keyword in tool_input for keyword in role_play_keywords):
+#                     return "role_play"
+        
+#         return tool
+    
+#     # Default to search if no other conditions are met
+#     return "search"
+
 def router(state: list):
     print("> router")
     if isinstance(state["agent_out"], list) and state["agent_out"]:

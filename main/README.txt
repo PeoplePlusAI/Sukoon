@@ -16,6 +16,6 @@ Run the container:
 docker run -p 8888:8888 -e OPENAI_API_KEY=your_api_key_here langgraph-project
 
 If you're having trouble installing pugraphviz, use this command in terminal: 
-```!apt-get install python3-dev graphviz libgraphviz-dev pkg-config```
+- !apt-get install python3-dev graphviz libgraphviz-dev pkg-config
 
 

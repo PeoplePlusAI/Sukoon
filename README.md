@@ -16,6 +16,12 @@ create a .env file and add these values there -
 OPENAI_API_KEY = '<YOUR_OPENAI_API_KEY>' 
 LANGCHAIN_API_KEY = '<YOUR_LANGCHAIN_API_KEY>'
 
+On Mac/Linux -
+export OPENAI_API_KEY=your_api_key_here
+
+On Windows -
+setx OPENAI_API_KEY "your_api_key_here"
+
 ```
 
 

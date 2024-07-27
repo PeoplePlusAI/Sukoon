@@ -10,6 +10,15 @@ We want to build open-source solutions and standards for using AI to solve menta
 - go to sukoon-frontend(cd sukoon-frontend), run 'npm start' to access it in your browser.
 - alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app
 ```
+
+```
+create a .env file and add these values there -
+OPENAI_API_KEY = '<YOUR_OPENAI_API_KEY>' 
+LANGCHAIN_API_KEY = '<YOUR_LANGCHAIN_API_KEY>'
+
+```
+
+
 # Current Landscape
 Currently availing mental health has a lot of issues such as:
 Stigma -  In India, mental health issues are not considered as healthcare issues. Any person suffering from mental issues is considered weak. Stigma and discrimination often undermine social support structures. Persons suffering from such issues are often tagged as ‘lunatics’ by society. This leads to a vicious cycle of shame, suffering and isolation of the patients.

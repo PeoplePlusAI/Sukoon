@@ -10,19 +10,20 @@ We want to build open-source solutions and standards for using AI to solve menta
 - go to sukoon-frontend(cd sukoon-frontend), run 'npm start' to access it in your browser.
 - alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app
 ```
-
+Steps to add environment variables - 
 ```
 create a .env file and add these values there -
 OPENAI_API_KEY = '<YOUR_OPENAI_API_KEY>' 
 LANGCHAIN_API_KEY = '<YOUR_LANGCHAIN_API_KEY>'
 
+- Alternatively , try this:
 On Mac/Linux -
 export OPENAI_API_KEY=your_api_key_here
 
 On Windows -
 setx OPENAI_API_KEY "your_api_key_here"
-
 ```
+
 
 
 # Current Landscape

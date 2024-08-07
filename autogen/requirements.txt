@@ -1,0 +1,5 @@
+pyautogen
+llama-index
+fastapi
+uvicorn
+# pyautogen[retrievechat]

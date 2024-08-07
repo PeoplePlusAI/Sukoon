@@ -7,6 +7,7 @@ import operator
 import os.path
 import logging
 import sys
+import re
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -25,8 +26,6 @@ class AgentState(TypedDict):
     input: str # accepts user's input as string
     agent_out : Union[AgentAction, AgentFinish, None] # gives output
     intermediate_steps: Annotated[List[tuple[AgentAction, str]], operator.add] # shows intermediate steps
-
-# In[2]:
 
 with open("prompts/sample_data.txt", 'r') as file:
     data = file.read().strip()
@@ -57,6 +56,12 @@ def llama_index(query: str):
 # llama_index("what is immediate care?")
 from langchain_core.tools import tool
 
+# Caching mechanism for search results
+# @lru_cache(maxsize=100)
+# def cached_search(query: str):
+#     # Implement actual search logic here
+#     return f"Cached search result for: {query}"
+
 @tool("search")
 def search_tool(query: str):
     """Searches for information on the topic of providing immediate care."""
@@ -82,21 +87,6 @@ def role_play_tool(query: str):
     return chat_completion(query)
 
 
-def chat_completion(query):
-    client = OpenAI(api_key=openai_api_key)
-    prompt_text = """You are an empathetic AI trained to perform role-play scenarios for mental health first aid. Given a situation, you will output a constructive dialogue showing how to provide effective support. Your responses should be compassionate, informative, and tailored to the specific scenario. For example, if asked about helping a daughter feeling suicidal, you'll demonstrate a supportive conversation between a parent and child, emphasizing active listening, validation of feelings, and appropriate steps for seeking professional help."""
-
-    response = client.chat.completions.create(
-        model="gpt-4",  # Using GPT-4 for more nuanced responses
-        messages=[
-            {"role": "system", "content": prompt_text},
-            {"role": "user", "content": query}
-        ],
-        temperature=0.7  # Slightly increased for more creative responses
-    )
-    return response.choices[0].message.content
-
-
 import os
 from langchain.agents import create_openai_tools_agent
 from langchain import hub
@@ -111,7 +101,9 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
 llm = ChatOpenAI(
-    model="gpt-4o",
+    model="gpt-4o", # compare mini and gpt4o , see the most important this is eval. so have one loop scenario to test this and eval if loop is fine .. do this first before fixing any framework like langgraph .. i use autogen. but
+    # if u have already done this langgraph.. dont do everything at first. just plan one convo scenario first. eval if it is doing well. 
+    # so for eg lets do the scenario in board.
     openai_api_key=openai_api_key,
     temperature=0.1
 )
@@ -136,11 +128,6 @@ prompt = ChatPromptTemplate.from_messages([
   ("placeholder", "{agent_scratchpad}"),
 ])
 
-planner_agent_runnable = create_openai_tools_agent(
-    llm=llm,
-    tools=[final_answer_tool, search_tool, role_play_tool],
-    prompt=prompt
-)
 
 # ### Define Nodes for Graph
 
@@ -170,68 +157,92 @@ def execute_role_play(state: list):
     )
     return {"intermediate_steps": [{"role_play": str(out)}]}
 
-import re
+# for role playing
+# use AI assistant for interactive chat
+# def chat_completion(query):
+#     client = OpenAI(api_key=openai_api_key)
+#     prompt_text = """You are an empathetic AI trained to perform role-play scenarios for mental health first aid. Given a situation, you will output a constructive dialogue showing how to provide effective support. Your responses should be compassionate, informative, and tailored to the specific scenario. For example, if asked about helping a daughter feeling suicidal, you'll demonstrate a supportive conversation between a parent and child, emphasizing active listening, validation of feelings, and appropriate steps for seeking professional help."""
 
-# def router(state: dict):
-#     print("> router")
-#     input_text = state["input"].lower()
-    
-#     # Keywords that might indicate a need for role play
-#     role_play_keywords = [
-#         "role play", "scenario", "simulate", "practice", "conversation",
-#         "dialogue", "interact", "pretend", "act out", "example situation"
-#     ]
-    
-#     # Keywords that indicate a request for mental health first aid information
-#     mhfa_keywords = [
-#         "mental health first aid", "mhfa", "first aid for mental health",
-#         "mental health support", "mental health assistance",
-#         "how to help someone with mental health", "mental health crisis",
-#         "mental health emergency", "mental health intervention"
-#     ]
-    
-#     # Check if the input is asking for mental health first aid information
-#     if any(keyword in input_text for keyword in mhfa_keywords):
-#         return "search"
-    
-#     # Check if any role play keywords are in the input
-#     if any(keyword in input_text for keyword in role_play_keywords):
-#         return "role_play"
-    
-#     # Check if the input is asking for help with a specific situation
-#     if re.search(r"how (should|can|do) I (help|deal with|handle|approach)", input_text):
-#         return "role_play"
-    
-#     # If the agent output exists and is a list
-#     if isinstance(state["agent_out"], list) and state["agent_out"]:
-#         tool = state["agent_out"][-1].tool
-        
-#         # If the agent explicitly chose role_play
-#         if tool == "role_play":
-#             return "role_play"
-        
-#         # If the agent chose search, but the content might benefit from role play
-#         if tool == "search":
-#             action = state["agent_out"][-1]
-#             if hasattr(action, 'tool_input'):
-#                 tool_input = action.tool_input.lower()
-#                 if any(keyword in tool_input for keyword in role_play_keywords):
-#                     return "role_play"
-        
-#         return tool
-    
-#     # Default to search if no other conditions are met
-#     return "search"
+#     response = client.chat.completions.create(
+#         model="gpt-4o",  # Using GPT-4 for more nuanced responses
+#         messages=[
+#             {"role": "system", "content": prompt_text},
+#             {"role": "user", "content": query}
+#         ],
+#         temperature=0.7  # Slightly increased for more creative responses
+#     )
+#     return response.choices[0].message.content
 
-def router(state: list):
+
+
+planner_agent_runnable = create_openai_tools_agent(
+    llm=llm,
+    tools=[final_answer_tool, search_tool, role_play_tool],
+    prompt=prompt
+)
+
+
+def router(state: dict):
     print("> router")
+    input_text = state["input"].lower()
+    
+    # Keywords that might indicate a need for role play
+    role_play_keywords = [
+        "role play", "scenario", "simulate", "practice", "conversation",
+        "dialogue", "interact", "pretend", "act out", "example situation"
+    ]
+    
+    # Keywords that indicate a request for mental health first aid information
+    mhfa_keywords = [
+        "mental health first aid", "mhfa", "first aid for mental health",
+        "mental health support", "mental health assistance",
+        "how to help someone with mental health", "mental health crisis",
+        "mental health emergency", "mental health intervention"
+    ]
+    
+    # Check if the input is asking for mental health first aid information
+    if any(keyword in input_text for keyword in mhfa_keywords):
+        return "search"
+    
+    # Check if any role play keywords are in the input
+    if any(keyword in input_text for keyword in role_play_keywords):
+        return "role_play"
+    
+    # Check if the input is asking for help with a specific situation
+    if re.search(r"how (should|can|do) I (help|deal with|handle|approach)", input_text):
+        return "role_play"
+    
+    # If the agent output exists and is a list
     if isinstance(state["agent_out"], list) and state["agent_out"]:
         tool = state["agent_out"][-1].tool
-        if "role play" in state["input"].lower() or tool == "role_play":
+        
+        # If the agent explicitly chose role_play
+        if tool == "role_play":
             return "role_play"
+        
+        # If the agent chose search, but the content might benefit from role play
+        if tool == "search":
+            action = state["agent_out"][-1]
+            if hasattr(action, 'tool_input'):
+                tool_input = action.tool_input.lower()
+                if any(keyword in tool_input for keyword in role_play_keywords):
+                    return "role_play"
+        
         return tool
-    else:
-        return "error"
+    
+    # Default to search if no other conditions are met
+    return "search"
+
+
+# def router(state: list):
+#     print("> router")
+#     if isinstance(state["agent_out"], list) and state["agent_out"]:
+#         tool = state["agent_out"][-1].tool
+#         if "role play" in state["input"].lower() or tool == "role_play":
+#             return "role_play"
+#         return tool
+#     else:
+#         return "error"
 
 # finally, we will have a single LLM call that MUST use the final_answer structure
 final_answer_llm = llm.bind_tools([final_answer_tool], tool_choice="final_answer")

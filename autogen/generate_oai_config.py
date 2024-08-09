@@ -11,6 +11,9 @@ with open('OAI_CONFIG_LIST.template.json', 'r') as template_file:
 
 # Replace placeholders with actual API key
 api_key = os.getenv('OPENAI_API_KEY')
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set")
+
 for config in config_template:
     config['api_key'] = api_key
 

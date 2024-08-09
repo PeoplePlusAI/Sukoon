@@ -1,11 +1,17 @@
 {
-    "name": "Mental Health Assistant",
-    "dockerFile": "../Dockerfile",
-    "settings": {
-      "terminal.integrated.shell.linux": "/bin/bash"
-    },
-    "extensions": [
-      "ms-python.python"
-    ],
-    "forwardPorts": [80]
+  "name": "Mental Health Assistant",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "mental-health-assistant",
+  "workspaceFolder": "/app",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "ms-python.python",
+    "ms-azuretools.vscode-docker"
+  ],
+  "forwardPorts": [80],
+  "remoteEnv": {
+    "OPENAI_API_KEY": "${localEnv:OPENAI_API_KEY}"
   }
+}

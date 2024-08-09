@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir pyautogen[retrievechat] openai chromadb
+RUN pip install --no-cache-dir pyautogen pyautogen[retrievechat] openai chromadb
 
 # Make port 80 available to the world outside this container
 EXPOSE 80

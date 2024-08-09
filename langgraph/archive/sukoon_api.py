@@ -6,7 +6,7 @@ import json
 from langgraph.graph import StateGraph, END
 
 # Import necessary functions and classes from Sukoon project
-from main.archive.sukoon import (
+from sukoon import (
     AgentState,
     run_planner_agent,
     execute_search,

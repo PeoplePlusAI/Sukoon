@@ -159,28 +159,25 @@ def execute_role_play(state: list):
 
 # for role playing
 # use AI assistant for interactive chat
-# def chat_completion(query):
-#     client = OpenAI(api_key=openai_api_key)
-#     prompt_text = """You are an empathetic AI trained to perform role-play scenarios for mental health first aid. Given a situation, you will output a constructive dialogue showing how to provide effective support. Your responses should be compassionate, informative, and tailored to the specific scenario. For example, if asked about helping a daughter feeling suicidal, you'll demonstrate a supportive conversation between a parent and child, emphasizing active listening, validation of feelings, and appropriate steps for seeking professional help."""
+def chat_completion(query):
+    client = OpenAI(api_key=openai_api_key)
+    prompt_text = """You are an empathetic AI trained to perform role-play scenarios for mental health first aid. Given a situation, you will output a constructive dialogue showing how to provide effective support. Your responses should be compassionate, informative, and tailored to the specific scenario. For example, if asked about helping a daughter feeling suicidal, you'll demonstrate a supportive conversation between a parent and child, emphasizing active listening, validation of feelings, and appropriate steps for seeking professional help."""
 
-#     response = client.chat.completions.create(
-#         model="gpt-4o",  # Using GPT-4 for more nuanced responses
-#         messages=[
-#             {"role": "system", "content": prompt_text},
-#             {"role": "user", "content": query}
-#         ],
-#         temperature=0.7  # Slightly increased for more creative responses
-#     )
-#     return response.choices[0].message.content
-
-
+    response = client.chat.completions.create(
+        model="gpt-4o",  # Using GPT-4 for more nuanced responses
+        messages=[
+            {"role": "system", "content": prompt_text},
+            {"role": "user", "content": query}
+        ],
+        temperature=0.7  # Slightly increased for more creative responses
+    )
+    return response.choices[0].message.content
 
 planner_agent_runnable = create_openai_tools_agent(
     llm=llm,
     tools=[final_answer_tool, search_tool, role_play_tool],
     prompt=prompt
 )
-
 
 def router(state: dict):
     print("> router")
@@ -278,6 +275,19 @@ def handle_error(state: list):
     function_call = out.additional_kwargs["tool_calls"][-1]["function"]["arguments"]
     return {"agent_out": function_call}
 
+# def chat_completion(query):
+#     prompt_text = "You have to act like a role playing bot.  Given a situation you will have to output a constructive dialogue on how to provide mental health first aid. eg if user says I've help my daughter who's feeling suicidal. You'll output a healthy conversation that shows supportive dad helping their daughter "
+#     client = OpenAI(api_key=openai_api_key)
+
+#     completion = client.chat.completions.create(
+#         model="gpt-4o",
+#         messages=[
+#             {"role": "system", "content": prompt_text},
+#             {"role": "user", "content": query}
+#         ],
+#         temperature=0.7,
+#     )
+#     return completion.choices[0].message.content
 
 # # graph part 
 

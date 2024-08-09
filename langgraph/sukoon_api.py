@@ -9,7 +9,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.graph import StateGraph, END
 
 # Import necessary functions and classes from Sukoon project
-from main.sukoon import (
+from sukoon import (
     AgentState,
     run_planner_agent,
     execute_search,

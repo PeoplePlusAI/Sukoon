@@ -10,6 +10,9 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir pyautogen pyautogen[retrievechat] openai chromadb
 
+# Generate OAI_CONFIG_LIST file
+RUN python generate_oai_config.py
+
 # Make port 80 available to the world outside this container
 EXPOSE 80
 
@@ -18,4 +21,4 @@ RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 
 # Run app.py when the container launches
-CMD ["python", "app.py"]
+CMD ["python", "mhfa_1.py"]

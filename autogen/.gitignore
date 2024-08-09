@@ -1,3 +1,17 @@
+# Ignore environment files
 .env
+
+# Ignore generated OAI_CONFIG_LIST file
+OAI_CONFIG_LIST
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
 .DS_Store
 autogen/.cache
+
+# Virtual environment
+venv/
+.venv/
+env/

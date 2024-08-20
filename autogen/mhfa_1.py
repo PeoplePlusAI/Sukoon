@@ -15,7 +15,7 @@ user = autogen.UserProxyAgent(
     is_termination_msg=termination_msg,
     human_input_mode="ALWAYS",
     max_consecutive_auto_reply=3,
-    code_execution_config=False,  # Disable code execution
+    code_execution_config=False,
 )
 
 # Create a RAG agent for data retrieval
@@ -26,14 +26,14 @@ rag_agent = RetrieveUserProxyAgent(
     max_consecutive_auto_reply=3,
     retrieve_config={
         "task": "qa",
-        "docs_path": "path/to/your/mental_health_docs",  # Replace with actual path
+        "docs_path": "path/to/your/mental_health_docs",
         "chunk_token_size": 1000,
         "model": config_list[0]["model"],
         "client": "openai",
         "embedding_model": "text-embedding-ada-002",
         "get_or_create": True,
     },
-    code_execution_config=False,  # Disable code execution
+    code_execution_config=False,
 )
 
 # Create specialized assistant agents

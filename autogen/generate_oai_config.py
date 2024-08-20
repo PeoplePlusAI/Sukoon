@@ -18,7 +18,11 @@ for config in config_template:
     config['api_key'] = api_key
 
 # Write the configuration to OAI_CONFIG_LIST
-with open('OAI_CONFIG_LIST', 'w') as config_file:
-    json.dump(config_template, config_file, indent=2)
+try:
+    with open('OAI_CONFIG_LIST', 'w') as config_file:
+        json.dump(config_template, config_file, indent=2)
 
-print("OAI_CONFIG_LIST file generated successfully.")
+    print("OAI_CONFIG_LIST file generated successfully.")
+    
+except:
+    print("OAI_CONFIG_LIST already exists")

@@ -7,7 +7,7 @@ from typing_extensions import Annotated
 config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
 llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
 
-os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
+# os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
 
 def termination_msg(x):
     return isinstance(x, dict) and "TERMINATE" == str(x.get("content", ""))[-9:].upper()
@@ -16,9 +16,10 @@ def termination_msg(x):
 user = autogen.UserProxyAgent(
     name="User",
     is_termination_msg=termination_msg,
-    human_input_mode="ALWAYS",
+    human_input_mode="ALWAYS", # "NEVER", "TERMINATE"
     max_consecutive_auto_reply=3,
-    code_execution_config={"use_docker": False},
+    # code_execution_config={"use_docker": False, "last_n_messages": 2, "work_dir": "groupchat"},
+    # function_map={"ask_expert": ask_expert},
 )
 
 # Create a RAG agent for data retrieval
@@ -30,13 +31,13 @@ rag_tool = RetrieveUserProxyAgent(
     retrieve_config={
         "task": "qa",
         "docs_path": "data/sample_data.txt",  # Replace with actual path
-        "chunk_token_size": 1000,
+        "chunk_token_size": 200,
         "model": config_list[0]["model"],
         "client": "openai",
-        "embedding_model": "text-embedding-ada-002",
+        "embedding_model": "text-embedding-ada-003",
         "get_or_create": True,
     },
-    code_execution_config={"use_docker": False},
+    # code_execution_config={"use_docker": False},
 )
 
 # Create specialized agents
@@ -71,7 +72,8 @@ suicide_prevention_agent = autogen.AssistantAgent(
     1. Assess the immediate risk level.
     2. Provide crisis intervention techniques.
     3. Offer information about professional suicide prevention resources and helplines.
-    4. Always prioritize the user's safety and well-being.""",
+    4. Always prioritize the user's safety and well-being.
+    Reply TERMINATE when the task is done.""",
     llm_config=llm_config,
 )
 
@@ -113,7 +115,7 @@ groupchat = autogen.GroupChat(
     messages=[],
     max_round=15,
     speaker_selection_method="auto", # availbale options: round_robin, customized speaker selection function (Callable)
-    allow_repeat_speaker=False,
+    allow_repeat_speaker=True, # False
 )
 
 manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
@@ -138,3 +140,31 @@ if __name__ == "__main__":
             print("Thank you for using the Mental Health Assistant. Take care!")
             break
         start_conversation(user_input)
+        
+        
+# assistant_for_student = autogen.AssistantAgent(
+#     name="assistant_for_student",
+#     system_message="You are a helpful assistant. Reply TERMINATE when the task is done.",
+#     llm_config={
+#         "timeout": 600,
+#         "cache_seed": 42,
+#         "config_list": config_list,
+#         "temperature": 0,
+#         "functions": [
+#             {
+#                 "name": "ask_expert",
+#                 "description": "ask expert when you can't solve the problem satisfactorily.",
+#                 "parameters": {
+#                     "type": "object",
+#                     "properties": {
+#                         "message": {
+#                             "type": "string",
+#                             "description": "question to ask expert. Ensure the question includes enough context, such as the code and the execution result. The expert does not know the conversation between you and the user unless you share the conversation with the expert.",
+#                         },
+#                     },
+#                     "required": ["message"],
+#                 },
+#             }
+#         ],
+#     },
+# )

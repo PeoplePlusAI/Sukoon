@@ -25,7 +25,7 @@ user = autogen.UserProxyAgent(
     is_termination_msg=termination_msg,
     human_input_mode="ALWAYS", # "NEVER", "TERMINATE"
     max_consecutive_auto_reply=3,
-    # code_execution_config={"use_docker": False, "last_n_messages": 2, "work_dir": "groupchat"},
+    code_execution_config={"use_docker": False}, # "work_dir":"_output"
     # function_map={"ask_expert": ask_expert},
 )
 
@@ -150,6 +150,7 @@ def start_conversation(user_input):
         manager,
         message=f"User input: {user_input}\nAssess the situation, decide on the next step, and respond accordingly.",
     )
+    # (clear_history=False) to continue the old conversation.
 
 # Function for Empathetic Agent to call Role Playing Agent
 def initiate_role_play(empathetic_agent, role_playing_agent, scenario):
@@ -162,39 +163,11 @@ def initiate_role_play(empathetic_agent, role_playing_agent, scenario):
 if __name__ == "__main__":
     print("Welcome to the Enhanced Mental Health Assistant.")
     print("You can discuss your concerns, and our AI team will assist you.")
-    print("Type 'quit' or 'bye' to exit the conversation.")
+    print("Type 'exit' or 'quit' or 'end' or 'bye' to exit the conversation.")
     
     while True:
         user_input = input("\nYou: ")
-        if user_input.lower() == 'quit' or 'bye':
+        if user_input.lower() == 'exit':
             print("Thank you for using the Mental Health Assistant. Take care!")
             break
         start_conversation(user_input)
-
-
-# assistant_for_student = autogen.AssistantAgent(
-#     name="assistant_for_student",
-#     system_message="You are a helpful assistant. Reply TERMINATE when the task is done.",
-#     llm_config={
-#         "timeout": 600,
-#         "cache_seed": 42,
-#         "config_list": config_list,
-#         "temperature": 0,
-#         "functions": [
-#             {
-#                 "name": "ask_expert",
-#                 "description": "ask expert when you can't solve the problem satisfactorily.",
-#                 "parameters": {
-#                     "type": "object",
-#                     "properties": {
-#                         "message": {
-#                             "type": "string",
-#                             "description": "question to ask expert. Ensure the question includes enough context, such as the code and the execution result. The expert does not know the conversation between you and the user unless you share the conversation with the expert.",
-#                         },
-#                     },
-#                     "required": ["message"],
-#                 },
-#             }
-#         ],
-#     },
-# )

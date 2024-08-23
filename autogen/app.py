@@ -48,7 +48,7 @@ user = autogen.UserProxyAgent(
 # )
 
 # llama-index function for RAG
-def rag(query: str):
+def rag(query: str) -> str:
     PERSIST_DIR = "./storage"
     if not os.path.exists(PERSIST_DIR):
         documents = SimpleDirectoryReader("data").load_data() # data/sample_data.txt
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     
     while True:
         user_input = input("\nYou: ")
-        if user_input.lower() == 'exit':
+        if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
             print("Thank you for using the Mental Health Assistant. Take care!")
             break
         start_conversation(user_input)

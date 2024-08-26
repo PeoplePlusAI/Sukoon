@@ -1,5 +1,6 @@
 import os
 import autogen
+import yaml
 # from autogen.agentchat.contrib.retrieve_user_proxy_agent import RetrieveUserProxyAgent
 from typing_extensions import Annotated
 
@@ -16,6 +17,13 @@ llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
 
 # os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
 
+# load YAML file
+def load_prompts(file_path='prompts.yaml'):
+    with open(file_path, 'r') as file:
+        prompts = yaml.safe_load(file)
+        
+prompts = load_prompts()
+
 def termination_msg(x):
     return isinstance(x, dict) and "TERMINATE" == str(x.get("content", ""))[-9:].upper()
 
@@ -26,6 +34,7 @@ user = autogen.UserProxyAgent(
     human_input_mode="ALWAYS", # "NEVER", "TERMINATE"
     max_consecutive_auto_reply=3,
     code_execution_config={"use_docker": False}, # "work_dir":"_output"
+    default_auto_reply="Reply `TERMINATE` if the task is done.",
     # function_map={"ask_expert": ask_expert},
 )
 
@@ -76,28 +85,41 @@ planner_agent = autogen.AssistantAgent(
 
 empathetic_agent = autogen.AssistantAgent(
     name="EmpatheticAgent",
-    system_message="""You are an empathetic conversational agent for mental health support. 
-    Your tasks include:
-    1. Gathering context about the user's situation.
-    2. If the user exhibits suicidal tendencies and mentions about suicide then route to the Suicide Prevention Agent.
-    3. Providing reassuring and helpful responses using RAG function.
-    4. Deciding when to involve the Role Playing Agent for simulations.
-    5. Use the RAG tool when needed to provide accurate information.""",
+    system_message=prompts['empathetic_agent_prompt'], # with added inputs of Neelanjan
     llm_config=llm_config,
-    # function_map={"RAG": rag},
 )
+
+# previous prompt
+# empathetic_agent = autogen.AssistantAgent(
+#     name="EmpatheticAgent",
+#     system_message="""You are an empathetic conversational agent for mental health support. 
+#     Your tasks include:
+#     1. Gathering context about the user's situation.
+#     2. If the user exhibits suicidal tendencies and mentions about suicide then route to the Suicide Prevention Agent.
+#     3. Providing reassuring and helpful responses using RAG function.
+#     4. Deciding when to involve the Role Playing Agent for simulations.
+#     5. Use the RAG tool when needed to provide accurate information.""",
+#     llm_config=llm_config,
+#     # function_map={"RAG": rag},
+# )
 
 suicide_prevention_agent = autogen.AssistantAgent(
     name="SuicidePreventionAgent",
-    system_message="""You are a specialized agent for suicide prevention. 
-    When called upon:
-    1. Assess the immediate risk level.
-    2. Provide crisis intervention techniques like QPR (Question, Persuade, Refer)
-    3. Offer information about professional suicide prevention resources and helplines like +919152987821, +918046110007
-    4. Always prioritize the user's safety and well-being.
-    5. Reply TERMINATE when the task is done.""",
+    system_message=prompts['suicide_prevention_agent_prompt'],
     llm_config=llm_config,
 )
+
+# suicide_prevention_agent = autogen.AssistantAgent(
+#     name="SuicidePreventionAgent",
+#     system_message="""You are a specialized agent for suicide prevention. 
+#     When called upon:
+#     1. Assess the immediate risk level.
+#     2. Provide crisis intervention techniques like QPR (Question, Persuade, Refer)
+#     3. Offer information about professional suicide prevention resources and helplines like +919152987821, +918046110007
+#     4. Always prioritize the user's safety and well-being.
+#     5. Reply TERMINATE when the task is done.""",
+#     llm_config=llm_config,
+# )
 
 role_playing_agent = autogen.AssistantAgent(
     name="RolePlayingAgent",

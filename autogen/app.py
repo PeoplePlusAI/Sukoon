@@ -11,6 +11,9 @@ from llama_index.core import (
     load_index_from_storage,
 )
 
+# chainlit 
+import chainlit as cl
+
 # Configure the agents
 config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
 llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}

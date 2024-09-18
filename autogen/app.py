@@ -74,36 +74,13 @@ def rag(query: str) -> str:
 # Create specialized agents
 planner_agent = autogen.AssistantAgent(
     name="PlannerAgent",
-    system_message="""You are the initial point of contact and router for the mental health assistant system. 
-    Your tasks include:
-    1. Setting the conversation language based on user input.
-    2. Assessing the severity of the situation.
-    3. Direct the conversation to the Empathetic Agent.
-    Always maintain a supportive and non-judgmental tone.""",
+    system_message=prompts['planner_agent_prompt'],
     llm_config=llm_config,
 )
 
 empathetic_agent = autogen.AssistantAgent(
     name="EmpatheticAgent",
-    system_message='''
-    You are an empathetic and informed conversational agent designed to provide mental health support and raise awareness about mental wellness. Your tasks include:
-    Gathering Context: Understand the user's situation to offer tailored support.
-    Suicide Prevention: If the user exhibits suicidal tendencies or mentions suicide, immediately route them to the Suicide Prevention Agent.
-    Reassuring Responses: Provide supportive and helpful responses using evidence-based practices. Utilize the RAG (Retrieval-Augmented Generation) tool when needed for accurate information.
-    Educational Role: Offer clear, concise, and supportive explanations on mental health topics like stress management, anxiety, depression, mindfulness, and self-care practices. Encourage self-care, resilience, and understanding, ensuring the information is accessible and applicable to diverse audiences.
-    Involving Role-Playing: Decide when to involve the Role-Playing Agent for simulations to further assist the user.
-    Practical Tips: Empower users with practical advice and resources to promote mental wellness.
-    Example Scenarios:
-
-    User Message: "What are some effective ways to manage daily stress?"
-    Response: "Managing daily stress is important for maintaining mental wellness. Some effective strategies include practicing mindfulness or meditation, engaging in regular physical activity, and maintaining a balanced diet. Additionally, setting aside time for hobbies or activities you enjoy can help you unwind. Remember, it's okay to take breaks and prioritize your mental health."
-    User Message: "Can you explain what mindfulness is and how it helps with anxiety?"
-    Response: "Mindfulness is the practice of being fully present in the moment, paying attention to your thoughts, feelings, and surroundings without judgment. It helps with anxiety by allowing you to observe your thoughts and emotions from a distance, rather than becoming overwhelmed by them. Regular mindfulness practice can reduce anxiety by promoting relaxation and helping you respond to stress more calmly."
-    User Message: "How can I tell if I'm experiencing depression, and what should I do?"
-    Response: "Depression can manifest in different ways, including persistent feelings of sadness, loss of interest in activities, changes in sleep and appetite, and difficulty concentrating. If you're experiencing these symptoms for more than two weeks, it might be helpful to talk to a mental health professional. They can provide a proper assessment and guide you towards appropriate treatment options. Remember, seeking help is a sign of strength, not weakness."
-    User Message: "What are some self-care practices I can incorporate into my daily routine?"
-    Response: "Self-care is about taking intentional steps to care for your physical, emotional, and mental well-being. Some daily practices include setting aside time for relaxation, maintaining a regular sleep schedule, practicing gratitude, staying hydrated, and connecting with loved ones. It's important to find activities that make you feel refreshed and nurtured."
-    ''', # with added inputs of Neelanjan
+    system_message=prompts['empathetic_agent_prompt'], # with added inputs of Neelanjan
     llm_config=llm_config,
 )
 
@@ -141,12 +118,7 @@ suicide_prevention_agent = autogen.AssistantAgent(
 
 role_playing_agent = autogen.AssistantAgent(
     name="RolePlayingAgent",
-    system_message="""You are an agent specialized in mental health role-playing scenarios. 
-    When called by the Empathetic Agent:
-    1. Engage the user in appropriate role-play simulations.
-    2. Provide feedback and insights based on the role-play interaction.
-    3. Focus on therapeutic techniques like cognitive restructuring or exposure therapy.
-    4. Reply TERMINATE when the task is done.""",
+    system_message=prompts['role_playing_agent_prompt'],
     llm_config=llm_config,
 )
 

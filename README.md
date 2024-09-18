@@ -3,6 +3,9 @@
 # Vision
 We want to build open-source solutions and standards for using AI to solve mental health challenges. The goal is to apply DPI knowledge and practices that can help professionals deeply explore and understand the latest advancements in AI and how they can be applied to use-cases in mental health specific to India. 
 
+
+Hey, Welcome to contributing to this open source project to solve Mental health.
+
 # Steps to run
 
 ```
@@ -45,7 +48,7 @@ Availability of trained Mental Healthcare Personnel: There is a severe shortage 
 Affordability - Most Mental healthcare sessions are costly as per Indian incomes, hence out of reach of most population(~95%)
 Budgetary Constraints - Low budget Allocation: Developed countries allocate 5-18% of their annual healthcare budget on mental healthcare, while India allocates roughly 0.05% (Organization for Economic Co-operation and Development, 2014) of its healthcare budget. This is the lowest among all G20 countries. Despite a rise in mental illness issues, the Union Ministry of Health allocated less than 1% of its budget to directly deal with psychological illnesses in 2022.
 
-# Proposed Solution
+# Proposed Solution:
 AI Companion
 Solves for personalization, accessibility (available 24/7), affordability
 

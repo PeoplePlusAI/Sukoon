@@ -8,7 +8,7 @@ We want to build open-source solutions and standards for using AI to solve menta
 ```
 - Go to autogen subfolder ( cd autogen) from terminal
 - install all dependencies in your environment (pip install -r requirements.txt)
-- run 'python app.py' 
+- run 'python app.py' or 'mhfa_1.py'
 ```
 Steps to add environment variables - 
 ```

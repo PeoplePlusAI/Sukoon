@@ -10,6 +10,7 @@ We want to build open-source solutions and standards for using AI to solve menta
 - install all dependencies in your environment (pip install -r requirements.txt)
 - run 'python app.py' 
 - start talking with AI agents
+Note: if you're getting SQL Lite error, please open a git issue.
 ```
 
 ### the previous version used langgraph, for which the steps are:

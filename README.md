@@ -4,6 +4,15 @@
 We want to build open-source solutions and standards for using AI to solve mental health challenges. The goal is to apply DPI knowledge and practices that can help professionals deeply explore and understand the latest advancements in AI and how they can be applied to use-cases in mental health specific to India. 
 
 # Steps to run
+
+```
+- Go to autogen subfolder ( cd autogen) from terminal of your choice
+- install all dependencies in your environment (pip install -r requirements.txt)
+- run 'python app.py' 
+- start talking with AI agents
+```
+
+### the previous version used langgraph, for which the steps are:
 ```
 - Go to langgraph subfolder ( cd langgraph) from terminal
 - install all dependencies in your environment (pip install -r requirements.txt)

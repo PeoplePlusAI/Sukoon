@@ -1,7 +1,10 @@
 import os
 import autogen
 import yaml
-
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List, Dict
+import uvicorn
 from llama_index.core import (
     VectorStoreIndex,
     SimpleDirectoryReader,
@@ -9,13 +12,13 @@ from llama_index.core import (
     load_index_from_storage,
 )
 
+app = FastAPI()
+
 # Configure the agents
 config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
 llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
 
-# os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
-
-# load YAML file
+# Load YAML file
 def load_prompts(file_path='prompts.yaml'):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
@@ -25,22 +28,11 @@ prompts = load_prompts()
 def termination_msg(x):
     return isinstance(x, dict) and "TERMINATE" == str(x.get("content", ""))[-9:].upper()
 
-# Create a user proxy agent
-user = autogen.UserProxyAgent(
-    name="User",
-    is_termination_msg=termination_msg,
-    human_input_mode="ALWAYS", # "NEVER", "TERMINATE"
-    max_consecutive_auto_reply=3,
-    code_execution_config={"use_docker": False}, # "work_dir":"_output"
-    default_auto_reply="Reply `TERMINATE` if the task is done.",
-    # function_map={"ask_expert": ask_expert},
-)
-
-# llama-index function for RAG
+# RAG function
 def rag(query: str) -> str:
     PERSIST_DIR = "./storage"
     if not os.path.exists(PERSIST_DIR):
-        documents = SimpleDirectoryReader("data").load_data() # data/sample_data.txt
+        documents = SimpleDirectoryReader("data").load_data()
         index = VectorStoreIndex.from_documents(documents)
         index.storage_context.persist(persist_dir=PERSIST_DIR)
     else:
@@ -50,6 +42,15 @@ def rag(query: str) -> str:
     query_engine = index.as_query_engine()
     response = query_engine.query(query)
     return str(response)
+
+# Create agents
+user = autogen.UserProxyAgent(
+    name="User",
+    is_termination_msg=termination_msg,
+    human_input_mode="NEVER",
+    max_consecutive_auto_reply=3,
+    code_execution_config={"use_docker": False},
+)
 
 agents = {
     "planner": autogen.AssistantAgent(
@@ -76,30 +77,46 @@ for agent in agents.values():
     )(rag)
 
 groupchat = autogen.GroupChat(
-    agents=[user, agents["empathetic"], agents["suicide_prevention"]], ##role_playing_agent
+    agents=[user, agents["empathetic"], agents["suicide_prevention"]],
     messages=[],
     max_round=15,
-    speaker_selection_method="auto", # availbale options: round_robin, customized speaker selection function (Callable)
-    allow_repeat_speaker=True, # False
+    speaker_selection_method="auto",
+    allow_repeat_speaker=False, # enable True to have conversation with same agent
 )
 
 manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
 
-# Function to start the conversation
-def start_conversation(user_input):
-    agents["planner"].initiate_chat(
+# Pydantic models for request and response
+class ChatRequest(BaseModel):
+    message: str
+
+class ChatResponse(BaseModel):
+    response: str
+
+# API endpoints
+@app.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    user_input = request.message
+    if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
+        return ChatResponse(response="Thank you for using the Mental Health Assistant. Take care!")
+    
+    # Start conversation with planner agent
+    response = agents["planner"].initiate_chat(
         manager,
         message=f"User input: {user_input}\nAssess the situation, decide on the next step, and respond accordingly.",
     )
-# Main loop
-if __name__ == "__main__":
-    print("Welcome to the Enhanced Mental Health Assistant.")
-    print("You can discuss your concerns, and our AI team will assist you.")
-    print("Type 'exit' or 'quit' or 'end' or 'bye' to exit the conversation.")
     
-    while True:
-        user_input = input("\nYou: ")
-        if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
-            print("Thank you for using the Mental Health Assistant. Take care!")
-            break
-        start_conversation(user_input)
+    # Process the response
+    if isinstance(response, str):
+        return ChatResponse(response=response)
+    elif isinstance(response, dict) and 'content' in response:
+        return ChatResponse(response=response['content'])
+    else:
+        raise HTTPException(status_code=500, detail="Unexpected response format")
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Mental Health Assistant API"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

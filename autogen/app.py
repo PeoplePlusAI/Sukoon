@@ -1,8 +1,6 @@
 import os
 import autogen
 import yaml
-# from autogen.agentchat.contrib.retrieve_user_proxy_agent import RetrieveUserProxyAgent
-from typing_extensions import Annotated
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -71,56 +69,68 @@ def rag(query: str) -> str:
     response = query_engine.query(query)
     return str(response)
 
-# Create specialized agents
-planner_agent = autogen.AssistantAgent(
-    name="PlannerAgent",
-    system_message=prompts['planner_agent_prompt'],
-    llm_config=llm_config,
+agents = {
+    "planner": autogen.AssistantAgent(
+        name="PlannerAgent",
+        system_message=prompts['planner_agent_prompt'],
+        llm_config=llm_config,
+    ),
+    "empathetic": autogen.AssistantAgent(
+        name="EmpatheticAgent",
+        system_message=prompts['empathetic_agent_prompt'],
+        llm_config=llm_config,
+    ),
+    "suicide_prevention": autogen.AssistantAgent(
+        name="SuicidePreventionAgent",
+        system_message=prompts['suicide_prevention_agent_prompt'],
+        llm_config=llm_config,
+    )
+}
+
+for agent in agents.values():
+    agent.register_for_llm(
+        description="Retrieve content related to mental health topics using RAG.",
+        api_style="function"
+    )(rag)
+
+groupchat = autogen.GroupChat(
+    agents=[user, agents["empathetic"], agents["suicide_prevention"]], ##role_playing_agent
+    messages=[],
+    max_round=15,
+    speaker_selection_method="auto", # availbale options: round_robin, customized speaker selection function (Callable)
+    allow_repeat_speaker=True, # False
 )
 
-empathetic_agent = autogen.AssistantAgent(
-    name="EmpatheticAgent",
-    system_message=prompts['empathetic_agent_prompt'], # with added inputs of Neelanjan
-    llm_config=llm_config,
-)
+manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
 
-# previous prompt
-# empathetic_agent = autogen.AssistantAgent(
-#     name="EmpatheticAgent",
-#     system_message="""You are an empathetic conversational agent for mental health support. 
-#     Your tasks include:
-#     1. Gathering context about the user's situation.
-#     2. If the user exhibits suicidal tendencies and mentions about suicide then route to the Suicide Prevention Agent.
-#     3. Providing reassuring and helpful responses using RAG function.
-#     4. Deciding when to involve the Role Playing Agent for simulations.
-#     5. Use the RAG tool when needed to provide accurate information.""",
-#     llm_config=llm_config,
-#     # function_map={"RAG": rag},
-# )
+# Function to start the conversation
+def start_conversation(user_input):
+    agents["planner"].initiate_chat(
+        manager,
+        message=f"User input: {user_input}\nAssess the situation, decide on the next step, and respond accordingly.",
+    )
+    # (clear_history=False) to continue the old conversation.
 
-suicide_prevention_agent = autogen.AssistantAgent(
-    name="SuicidePreventionAgent",
-    system_message=prompts['suicide_prevention_agent_prompt'],
-    llm_config=llm_config,
-)
+# Function for Empathetic Agent to call Role Playing Agent
+# def initiate_role_play(empathetic_agent, role_playing_agent, scenario):
+#     role_playing_agent.initiate_chat(
+#         manager,
+#         message=f"Let's start a role-play scenario. The user wants to help their {scenario}. Act as the {scenario} and engage in a conversation. After the role-play, provide feedback on the user's approach.",
+#     )
 
-# suicide_prevention_agent = autogen.AssistantAgent(
-#     name="SuicidePreventionAgent",
-#     system_message="""You are a specialized agent for suicide prevention. 
-#     When called upon:
-#     1. Assess the immediate risk level.
-#     2. Provide crisis intervention techniques like QPR (Question, Persuade, Refer)
-#     3. Offer information about professional suicide prevention resources and helplines like +919152987821, +918046110007
-#     4. Always prioritize the user's safety and well-being.
-#     5. Reply TERMINATE when the task is done.""",
-#     llm_config=llm_config,
-# )
-
-role_playing_agent = autogen.AssistantAgent(
-    name="RolePlayingAgent",
-    system_message=prompts['role_playing_agent_prompt'],
-    llm_config=llm_config,
-)
+# Main loop
+if __name__ == "__main__":
+    print("Welcome to the Enhanced Mental Health Assistant.")
+    print("You can discuss your concerns, and our AI team will assist you.")
+    print("Type 'exit' or 'quit' or 'end' or 'bye' to exit the conversation.")
+    
+    while True:
+        user_input = input("\nYou: ")
+        if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
+            print("Thank you for using the Mental Health Assistant. Take care!")
+            break
+        start_conversation(user_input)
+        
 
 # # Function to retrieve content using the RAG tool
 # def retrieve_content(
@@ -136,50 +146,3 @@ role_playing_agent = autogen.AssistantAgent(
 #         _context = {"problem": message, "n_results": n_results}
 #         ret_msg = rag_tool.message_generator(rag_tool, None, _context)
 #     return ret_msg if ret_msg else message
-
-# Register the rag function for all agents
-for agent in [planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent]:
-    agent.register_for_llm(
-        description="Retrieve content related to mental health topics using RAG.",
-        api_style="function"
-    )(rag)
-
-# Create a group chat
-groupchat = autogen.GroupChat(
-    agents=[user, planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent],
-    messages=[],
-    max_round=15,
-    speaker_selection_method="auto", # availbale options: round_robin, customized speaker selection function (Callable)
-    allow_repeat_speaker=True, # False
-)
-
-manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
-
-# Function to start the conversation
-def start_conversation(user_input):
-    # Always start with the planner agent
-    planner_agent.initiate_chat(
-        manager,
-        message=f"User input: {user_input}\nAssess the situation, decide on the next step, and respond accordingly.",
-    )
-    # (clear_history=False) to continue the old conversation.
-
-# Function for Empathetic Agent to call Role Playing Agent
-def initiate_role_play(empathetic_agent, role_playing_agent, scenario):
-    role_playing_agent.initiate_chat(
-        manager,
-        message=f"Let's start a role-play scenario. The user wants to help their {scenario}. Act as the {scenario} and engage in a conversation. After the role-play, provide feedback on the user's approach.",
-    )
-
-# Main loop
-if __name__ == "__main__":
-    print("Welcome to the Enhanced Mental Health Assistant.")
-    print("You can discuss your concerns, and our AI team will assist you.")
-    print("Type 'exit' or 'quit' or 'end' or 'bye' to exit the conversation.")
-    
-    while True:
-        user_input = input("\nYou: ")
-        if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
-            print("Thank you for using the Mental Health Assistant. Take care!")
-            break
-        start_conversation(user_input)

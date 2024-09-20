@@ -25,6 +25,85 @@ On Windows -
 setx OPENAI_API_KEY "your_api_key_here"
 ```
 
+Documentation:
+Please see this article to understand how Autogen works - https://microsoft.github.io/autogen/docs/Getting-Started
+
+## Understanding and Debugging AutoGen
+
+## What is AutoGen?
+
+AutoGen is a framework for building multi-agent systems using large language models (LLMs). It allows you to create conversational AI agents that can interact with each other and with humans to solve complex tasks.
+
+Key features:
+1. Multi-agent conversations
+2. Customizable agent roles and behaviors
+3. Integration with external tools and APIs
+4. Flexible conversation flow control
+
+## Core Concepts
+
+1. **Agents**: The building blocks of AutoGen. Each agent has a specific role (e.g., user proxy, assistant, coder).
+
+2. **GroupChat**: A conversation environment where multiple agents interact.
+
+3. **GroupChatManager**: Manages the flow of conversation in a GroupChat.
+
+4. **UserProxyAgent**: Represents the human user or serves as an interface for human input.
+
+5. **AssistantAgent**: AI-powered agents that perform tasks or provide information.
+
+## Common Debugging Issues and Solutions
+
+1. **API Key Issues**
+   - Problem: "Invalid API key" or "Authentication failed" errors.
+   - Solution: Double-check your API key in the `OAI_CONFIG_LIST` file or environment variables.
+
+2. **Infinite Loops**
+   - Problem: Agents keep talking to each other without reaching a conclusion.
+   - Solution: 
+     - Adjust the `max_round` parameter in GroupChat.
+     - Implement better termination conditions in agent logic.
+     - Use `allow_repeat_speaker=False` in GroupChat to prevent the same agent from speaking consecutively.
+
+3. **Unexpected Agent Behavior**
+   - Problem: Agents not following their intended roles or instructions.
+   - Solution: 
+     - Review and refine the `system_message` for each agent.
+     - Use more specific prompts or examples in the agent's instructions.
+     - Implement additional logic in custom agent classes to enforce desired behavior.
+
+4. **Memory Issues**
+   - Problem: Agents forgetting previous context or information.
+   - Solution:
+     - Implement a custom memory system for agents.
+     - Use the `memory` parameter in agent configuration to specify a memory backend.
+
+5. **Error Handling**
+   - Problem: Unhandled exceptions breaking the conversation flow.
+   - Solution:
+     - Implement try-except blocks in critical sections.
+     - Create custom error handling logic in your GroupChatManager subclass.
+
+6. **Performance Issues**
+   - Problem: Slow response times or high token usage.
+   - Solution:
+     - Use more efficient models for less complex tasks.
+     - Implement caching mechanisms for frequently accessed information.
+     - Optimize prompts to reduce token usage.
+
+7. **Integration Issues**
+   - Problem: Difficulty integrating external tools or APIs.
+   - Solution:
+     - Use the `function_map` parameter in UserProxyAgent to register custom functions.
+     - Implement custom agents that handle specific API integrations.
+
+8. **Debugging Tips**
+   - Use `print` statements or logging to track conversation flow and agent decisions.
+   - Implement a debug mode that provides more verbose output during execution.
+   - Use AutoGen's built-in conversation saving features to analyze conversations post-execution.
+
+Remember, AutoGen is highly customizable. Many issues can be resolved by subclassing existing components and implementing custom logic to suit your specific needs.
+
 # Current Landscape
 Currently availing mental health has a lot of issues such as:
 Stigma -  In India, mental health issues are not considered as healthcare issues. Any person suffering from mental issues is considered weak. Stigma and discrimination often undermine social support structures. Persons suffering from such issues are often tagged as ‘lunatics’ by society. This leads to a vicious cycle of shame, suffering and isolation of the patients.

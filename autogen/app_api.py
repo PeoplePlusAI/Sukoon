@@ -100,19 +100,22 @@ async def chat(request: ChatRequest):
     if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
         return ChatResponse(response="Thank you for using the Mental Health Assistant. Take care!")
     
-    # Start conversation with planner agent
-    response = agents["planner"].initiate_chat(
-        manager,
-        message=f"User input: {user_input}\nAssess the situation, decide on the next step, and respond accordingly.",
+    # Start conversation with planner agent to decide which agent to use. check generate_response method, else use generate_reply
+    planner_response = agents["planner"].generate_reply(
+        f"User input: {user_input}\nAssess the situation and decide which agent (empathetic or suicide_prevention) should handle this input. Only return the name of the chosen agent.",
     )
     
-    # Process the response
-    if isinstance(response, str):
-        return ChatResponse(response=response)
-    elif isinstance(response, dict) and 'content' in response:
-        return ChatResponse(response=response['content'])
-    else:
-        raise HTTPException(status_code=500, detail="Unexpected response format")
+    # Extract the chosen agent name
+    chosen_agent = planner_response.lower().strip()
+    if chosen_agent not in ["empathetic", "suicide_prevention"]:
+        chosen_agent = "empathetic"  # Default to empathetic agent if planner's response is unclear
+    
+    # Generate response from the chosen agent
+    agent_response = agents[chosen_agent].generate_response(
+        f"User input: {user_input}\nRespond to the user's input appropriately.",
+    )
+    
+    return ChatResponse(response=agent_response)
 
 @app.get("/")
 async def root():

@@ -117,7 +117,6 @@ def start_conversation(user_input):
 #         message=f"Let's start a role-play scenario. The user wants to help their {scenario}. Act as the {scenario} and engage in a conversation. After the role-play, provide feedback on the user's approach.",
 #     )
 
-# Main loop
 if __name__ == "__main__":
     print("Welcome to the Enhanced Mental Health Assistant.")
     print("You can discuss your concerns, and our AI team will assist you.")

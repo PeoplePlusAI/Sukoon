@@ -129,7 +129,7 @@ if __name__ == "__main__":
             break
         print()
         start_conversation(user_input)
-        
+        print()
         
 # # to check all message summary history
 # from autogen import initiate_chats

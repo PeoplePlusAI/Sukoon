@@ -1,0 +1,18 @@
+[
+  {
+    "model": "o1-preview",
+    "api_key": "sk-proj-G8DkqdX5EyhPwfPHrcVQT3BlbkFJJiLL3FuWNYxiVwdvzGMF"
+  },
+  {
+    "model": "gpt-4o",
+    "api_key": "sk-proj-G8DkqdX5EyhPwfPHrcVQT3BlbkFJJiLL3FuWNYxiVwdvzGMF"
+  },
+  {
+    "model": "gpt-4o-mini",
+    "api_key": "sk-proj-G8DkqdX5EyhPwfPHrcVQT3BlbkFJJiLL3FuWNYxiVwdvzGMF"
+  },
+  {
+    "model": "gpt-4",
+    "api_key": "sk-proj-G8DkqdX5EyhPwfPHrcVQT3BlbkFJJiLL3FuWNYxiVwdvzGMF"
+  }
+]

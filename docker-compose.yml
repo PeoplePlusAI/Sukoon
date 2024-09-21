@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  mental-health-assistant:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "80:80"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    command: python mhfa_1.py

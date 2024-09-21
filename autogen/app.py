@@ -9,6 +9,7 @@ from llama_index.core import (
     load_index_from_storage,
 )
 
+# from autogen import ConversableAgent
 # Configure the agents
 config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
 llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
@@ -51,46 +52,71 @@ def rag(query: str) -> str:
     response = query_engine.query(query)
     return str(response)
 
-agents = {
-    "planner": autogen.AssistantAgent(
-        name="PlannerAgent",
-        system_message=prompts['planner_agent_prompt'],
-        llm_config=llm_config,
-    ),
-    "empathetic": autogen.AssistantAgent(
-        name="EmpatheticAgent",
-        system_message=prompts['empathetic_agent_prompt'],
-        llm_config=llm_config,
-    ),
-    "suicide_prevention": autogen.AssistantAgent(
-        name="SuicidePreventionAgent",
-        system_message=prompts['suicide_prevention_agent_prompt'],
-        llm_config=llm_config,
-    )
-}
+planner_agent = autogen.AssistantAgent(
+    name="PlannerAgent",
+    system_message=prompts['planner_agent_prompt'],
+    llm_config=llm_config,
+)
 
-for agent in agents.values():
+empathetic_agent = autogen.AssistantAgent(
+    name="EmpatheticAgent",
+    system_message=prompts['empathetic_agent_prompt'],
+    llm_config=llm_config,
+)
+
+suicide_prevention_agent = autogen.AssistantAgent(
+    name="SuicidePreventionAgent",
+    system_message=prompts['suicide_prevention_agent_prompt'],
+    llm_config=llm_config,
+)
+
+# role_playing_agent = autogen.AssistantAgent(
+#     name="RolePlayingAgent",
+#     system_message=prompts['role_playing_agent_prompt'],
+#     llm_config=llm_config,
+# )
+
+# Register the rag function for all agents
+for agent in [planner_agent, empathetic_agent, suicide_prevention_agent]: #role_playing_agent
     agent.register_for_llm(
         description="Retrieve content related to mental health topics using RAG.",
         api_style="function"
     )(rag)
 
+# Create a group chat
 groupchat = autogen.GroupChat(
-    agents=[user, agents["empathetic"], agents["suicide_prevention"]], ##role_playing_agent
+    agents=[user, planner_agent, empathetic_agent, suicide_prevention_agent], #role_playing_agent
     messages=[],
-    max_round=15,
+    max_round=10,
     speaker_selection_method="auto", # availbale options: round_robin, customized speaker selection function (Callable)
     allow_repeat_speaker=True, # False
+    # allowed_or_disallowed_speaker_transitions={
+    #     user: [planner_agent, empathetic_agent, suicide_prevention_agent],
+    #     planner_agent: [user, empathetic_agent, suicide_prevention_agent],
+    #     empathetic_agent: [user, suicide_prevention_agent],
+    #     suicide_prevention_agent: [user, planner_agent],
+    #     role_playing_agent: [user, empathetic_agent, suicide_prevention_agent],
+    # },
+    # speaker_transitions_type="allowed",
 )
 
 manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
 
 # Function to start the conversation
 def start_conversation(user_input):
-    agents["planner"].initiate_chat(
+    # Always start with the planner agent
+    planner_agent.initiate_chat(
         manager,
         message=f"User input: {user_input}\nAssess the situation, decide on the next step, and respond accordingly.",
     )
+
+# Function for Empathetic Agent to call Role Playing Agent
+# def initiate_role_play(empathetic_agent, role_playing_agent, scenario):
+#     role_playing_agent.initiate_chat(
+#         manager,
+#         message=f"Let's start a role-play scenario. The user wants to help their {scenario}. Act as the {scenario} and engage in a conversation. After the role-play, provide feedback on the user's approach.",
+#     )
+
 # Main loop
 if __name__ == "__main__":
     print("Welcome to the Enhanced Mental Health Assistant.")
@@ -102,4 +128,20 @@ if __name__ == "__main__":
         if user_input.lower() in ['exit', 'quit', 'end', 'bye']:
             print("Thank you for using the Mental Health Assistant. Take care!")
             break
+        print()
         start_conversation(user_input)
+        print()
+        
+        
+# # to check all message summary history
+# from autogen import initiate_chats
+# # chats = [{list of tasks}]
+# chat_results = initiate_chats(chats)
+
+# for chat_result in chat_results:
+#     print(chat_result.summary)
+
+# # to measure costs 
+# for chat_result in chat_results:
+#     print(chat_result.cost)
+#     print("\n")

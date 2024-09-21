@@ -3,3 +3,4 @@
 /autogen_multi_agent
 OAI_CONFIG_LIST
 autogen/.cache/41/cache.db
+/__pycache__

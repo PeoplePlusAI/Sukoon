@@ -13,3 +13,4 @@ autogen/.cache/41/cache.db
 autogen/autogen_multi_agent/Autogen-UI-main.zip
 OAI_CONFIG_LIST
 /autogen_multi_agent
+/__pycache__

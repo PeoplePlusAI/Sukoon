@@ -4,7 +4,6 @@ import os
 import autogen
 import yaml
 from typing import Dict, Optional, Union
-from typing_extensions import Annotated
 import chainlit as cl
 from llama_index.core import (
     VectorStoreIndex,
@@ -12,9 +11,9 @@ from llama_index.core import (
     StorageContext,
     load_index_from_storage,
 )
-
+from autogen import Agent, AssistantAgent, UserProxyAgent, config_list_from_json
 # Load configuration and prompts
-config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
+config_list = config_list_from_json("OAI_CONFIG_LIST")
 llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
 
 def load_prompts(file_path='prompts.yaml'):
@@ -31,12 +30,18 @@ async def ask_helper(func, **kwargs):
     return res
 
 # Custom Chainlit Agent classes
-class ChainlitAssistantAgent(autogen.AssistantAgent):
-    async def send(self, message: Union[Dict, str], recipient: autogen.Agent, request_reply: Optional[bool] = None, silent: Optional[bool] = False):
+class ChainlitAssistantAgent(AssistantAgent):
+    async def send(
+        self,
+        message: Union[Dict, str],
+        recipient: autogen.Agent,
+        request_reply: Optional[bool] = None,
+        silent: Optional[bool] = False,
+    ):
         await cl.Message(content=f'*Sending message to "{recipient.name}":*\n\n{message}', author=self.name).send()
-        super().send(message=message, recipient=recipient, request_reply=request_reply, silent=silent)
+        return super().send(message=message, recipient=recipient, request_reply=request_reply, silent=silent)
 
-class ChainlitUserProxyAgent(autogen.UserProxyAgent):
+class ChainlitUserProxyAgent(UserProxyAgent):
     async def get_human_input(self, prompt: str) -> str:
         if prompt.startswith("Provide feedback to assistant. Press enter to skip and use auto-reply"):
             res = await ask_helper(
@@ -55,9 +60,16 @@ class ChainlitUserProxyAgent(autogen.UserProxyAgent):
         reply = await ask_helper(cl.AskUserMessage, content=prompt, timeout=60)
         return reply["content"].strip()
 
-    async def send(self, message: Union[Dict, str], recipient: autogen.Agent, request_reply: Optional[bool] = None, silent: Optional[bool] = False):
+    async def send(
+        self,
+        message: Union[Dict, str],
+        recipient: autogen.Agent,
+        request_reply: Optional[bool] = None,
+        silent: Optional[bool] = False,
+    ):
         await cl.Message(content=f'*Sending message to "{recipient.name}"*:\n\n{message}', author=self.name).send()
-        super().send(message=message, recipient=recipient, request_reply=request_reply, silent=silent)
+        return super().send(message=message, recipient=recipient, request_reply=request_reply, silent=silent)
+
 
 # RAG function
 def rag(query: str) -> str:
@@ -75,7 +87,7 @@ def rag(query: str) -> str:
     return str(response)
 
 # Create agents
-user = ChainlitUserProxyAgent(
+user_proxy = ChainlitUserProxyAgent(
     name="User",
     human_input_mode="ALWAYS",
     max_consecutive_auto_reply=3,
@@ -115,11 +127,11 @@ for agent in [planner_agent, empathetic_agent, suicide_prevention_agent, role_pl
 
 # Create group chat
 groupchat = autogen.GroupChat(
-    agents=[user, planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent],
+    agents=[user_proxy, planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent],
     messages=[],
     max_round=15,
     speaker_selection_method="auto",
-    allow_repeat_speaker=True,
+    # allow_repeat_speaker=True,
 )
 
 manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
@@ -127,25 +139,24 @@ manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
 # Chainlit chat start function
 @cl.on_chat_start
 async def on_chat_start():
+    cl.user_session.set("manager", manager)
+    cl.user_session.set("user_proxy", user_proxy)
     await cl.Message(content="Welcome to the Enhanced Mental Health Assistant. How can I help you today?").send()
 
 # Chainlit message handler
 @cl.on_message
-async def on_message(message: str):
-    if message in ['exit', 'quit', 'end', 'bye']:
+async def on_message(message: cl.Message):
+    manager = cl.user_session.get("manager")
+    user_proxy = cl.user_session.get("user_proxy")
+
+    if message.content.lower() in ['exit', 'quit', 'end', 'bye']:
         await cl.Message(content="Thank you for using the Mental Health Assistant. Take care!").send()
         return
 
-    # Start conversation with planner agent
-    response = await cl.make_async(planner_agent.initiate_chat)(
+    # Start conversation with user proxy
+    await cl.make_async(user_proxy.initiate_chat)(
         manager,
-        message=f"User input: {message}\nAssess the situation, decide on the next step, and respond accordingly.",
+        message=f"User input: {message.content}\nAssess the situation, decide on the next step, and respond accordingly.",
     )
 
-    # Process and send the response
-    if isinstance(response, str):
-        await cl.Message(content=response).send()
-    elif isinstance(response, dict) and 'content' in response:
-        await cl.Message(content=response['content']).send()
-    else:
-        await cl.Message(content="I'm sorry, I couldn't process that response. Can you please try again?").send()
+    # The responses will be sent automatically by the ChainlitAssistantAgent instances

@@ -4,3 +4,6 @@
 OAI_CONFIG_LIST
 autogen/.cache/41/cache.db
 /__pycache__
+/.cache/41
+/.cache
+.cache/41/cache.db

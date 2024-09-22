@@ -12,6 +12,7 @@ from llama_index.core import (
     load_index_from_storage,
 )
 from autogen import Agent, AssistantAgent, UserProxyAgent, config_list_from_json
+
 # Load configuration and prompts
 config_list = config_list_from_json("OAI_CONFIG_LIST")
 llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
@@ -23,59 +24,87 @@ def load_prompts(file_path='prompts.yaml'):
 prompts = load_prompts()
 
 # Chainlit helper functions
-async def ask_helper(func, **kwargs):
-    res = await func(**kwargs).send()
+def ask_helper(func, **kwargs):
+    res = cl.run_sync(func(**kwargs).send())
     while not res:
-        res = await func(**kwargs).send()
+        res = cl.run_sync(func(**kwargs).send())
     return res
 
 # Custom Chainlit Agent classes
 class ChainlitAssistantAgent(AssistantAgent):
-    async def send(
+    def send(
         self,
         message: Union[Dict, str],
-        recipient: autogen.Agent,
+        recipient: Agent,
         request_reply: Optional[bool] = None,
         silent: Optional[bool] = False,
-    ):
-        await cl.Message(content=f'*Sending message to "{recipient.name}":*\n\n{message}', author=self.name).send()
-        return super().send(message=message, recipient=recipient, request_reply=request_reply, silent=silent)
+    ) -> bool:
+        cl.run_sync(
+            cl.Message(
+                content=f'*Sending message to "{recipient.name}":*\n\n{message}',
+                author=self.name,
+            ).send()
+        )
+        return super().send(
+            message=message,
+            recipient=recipient,
+            request_reply=request_reply,
+            silent=silent,
+        )
 
 class ChainlitUserProxyAgent(UserProxyAgent):
-    async def get_human_input(self, prompt: str) -> str:
-        if prompt.startswith("Provide feedback to assistant. Press enter to skip and use auto-reply"):
-            res = await ask_helper(
-                cl.AskActionMessage,
-                content="Continue or provide feedback?",
-                actions=[
-                    cl.Action(name="continue", value="continue", label="✅ Continue"),
-                    cl.Action(name="feedback", value="feedback", label="💬 Provide feedback"),
-                    cl.Action(name="exit", value="exit", label="🔚 Exit Conversation"),
-                ],
+    def get_human_input(self, prompt: str) -> str:
+        if prompt.startswith(
+            "Provide feedback to assistant. Press enter to skip and use auto-reply"
+        ):
+            res = cl.run_sync(
+                ask_helper(
+                    cl.AskActionMessage,
+                    content="Continue or provide feedback?",
+                    actions=[
+                        cl.Action(name="continue", value="continue", label="✅ Continue"),
+                        cl.Action(name="feedback", value="feedback", label="💬 Provide feedback"),
+                        cl.Action(name="exit", value="exit", label="🔚 Exit Conversation"),
+                    ],
+                )
             )
             if res.get("value") == "continue":
                 return ""
             if res.get("value") == "exit":
                 return "exit"
-        reply = await ask_helper(cl.AskUserMessage, content=prompt, timeout=60)
+
+        reply = cl.run_sync(ask_helper(cl.AskUserMessage, content=prompt, timeout=60))
         return reply["content"].strip()
 
-    async def send(
+    def send(
         self,
         message: Union[Dict, str],
-        recipient: autogen.Agent,
+        recipient: Agent,
         request_reply: Optional[bool] = None,
         silent: Optional[bool] = False,
-    ):
-        await cl.Message(content=f'*Sending message to "{recipient.name}"*:\n\n{message}', author=self.name).send()
-        return super().send(message=message, recipient=recipient, request_reply=request_reply, silent=silent)
-
+    ) -> bool:
+        cl.run_sync(
+            cl.Message(
+                content=f'*Sending message to "{recipient.name}":*\n\n{message}',
+                author=self.name,
+            ).send()
+        )
+        return super().send(
+            message=message,
+            recipient=recipient,
+            request_reply=request_reply,
+            silent=silent,
+        )
 
 # RAG function
 def rag(query: str) -> str:
     PERSIST_DIR = "./storage"
+    DATA_DIR = "./data"
+
     if not os.path.exists(PERSIST_DIR):
-        documents = SimpleDirectoryReader("data").load_data()
+        if not os.path.exists(DATA_DIR):
+            raise FileNotFoundError(f"The data directory {DATA_DIR} does not exist.")
+        documents = SimpleDirectoryReader(DATA_DIR).load_data()
         index = VectorStoreIndex.from_documents(documents)
         index.storage_context.persist(persist_dir=PERSIST_DIR)
     else:
@@ -141,22 +170,26 @@ manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
 async def on_chat_start():
     cl.user_session.set("manager", manager)
     cl.user_session.set("user_proxy", user_proxy)
-    await cl.Message(content="Welcome to the Enhanced Mental Health Assistant. How can I help you today?").send()
+    await cl.Message(
+        content="Welcome to the Enhanced Mental Health Assistant. How can I help you today?"
+    ).send()
 
-# Chainlit message handler
 @cl.on_message
 async def on_message(message: cl.Message):
     manager = cl.user_session.get("manager")
     user_proxy = cl.user_session.get("user_proxy")
 
     if message.content.lower() in ['exit', 'quit', 'end', 'bye']:
-        await cl.Message(content="Thank you for using the Mental Health Assistant. Take care!").send()
+        await cl.Message(
+            content="Thank you for using the Mental Health Assistant. Take care!"
+        ).send()
         return
 
     # Start conversation with user proxy
-    await cl.make_async(user_proxy.initiate_chat)(
-        manager,
-        message=f"User input: {message.content}\nAssess the situation, decide on the next step, and respond accordingly.",
-    )
+    def initiate_chat():
+        user_proxy.initiate_chat(
+            manager,
+            message=f"User input: {message.content}\nAssess the situation, decide on the next step, and respond accordingly.",
+        )
 
-    # The responses will be sent automatically by the ChainlitAssistantAgent instances
+    await cl.make_async(initiate_chat)()

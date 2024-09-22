@@ -2,6 +2,7 @@
 
 import os
 import autogen
+import asyncio
 import yaml
 from typing import Dict, Optional, Union
 import chainlit as cl
@@ -31,6 +32,27 @@ def ask_helper(func, **kwargs):
     return res
 
 # Custom Chainlit Agent classes
+# class ChainlitAssistantAgent(AssistantAgent):
+#     def send(
+#         self,
+#         message: Union[Dict, str],
+#         recipient: Agent,
+#         request_reply: Optional[bool] = None,
+#         silent: Optional[bool] = False,
+#     ) -> bool:
+#         cl.run_sync(
+#             cl.Message(
+#                 content=f'*Sending message to "{recipient.name}":*\n\n{message}',
+#                 author=self.name,
+#             ).send()
+#         )
+#         return super().send(
+#             message=message,
+#             recipient=recipient,
+#             request_reply=request_reply,
+#             silent=silent,
+#         )
+
 class ChainlitAssistantAgent(AssistantAgent):
     def send(
         self,
@@ -52,49 +74,28 @@ class ChainlitAssistantAgent(AssistantAgent):
             silent=silent,
         )
 
+#  Make sure there are no nested cl.run_sync calls, which can cause unexpected behavior.
 class ChainlitUserProxyAgent(UserProxyAgent):
     def get_human_input(self, prompt: str) -> str:
         if prompt.startswith(
             "Provide feedback to assistant. Press enter to skip and use auto-reply"
         ):
-            res = cl.run_sync(
-                ask_helper(
-                    cl.AskActionMessage,
-                    content="Continue or provide feedback?",
-                    actions=[
-                        cl.Action(name="continue", value="continue", label="✅ Continue"),
-                        cl.Action(name="feedback", value="feedback", label="💬 Provide feedback"),
-                        cl.Action(name="exit", value="exit", label="🔚 Exit Conversation"),
-                    ],
-                )
+            res = ask_helper(
+                cl.AskActionMessage,
+                content="Continue or provide feedback?",
+                actions=[
+                    cl.Action(name="continue", value="continue", label="✅ Continue"),
+                    cl.Action(name="feedback", value="feedback", label="💬 Provide feedback"),
+                    cl.Action(name="exit", value="exit", label="🔚 Exit Conversation"),
+                ],
             )
             if res.get("value") == "continue":
                 return ""
             if res.get("value") == "exit":
                 return "exit"
 
-        reply = cl.run_sync(ask_helper(cl.AskUserMessage, content=prompt, timeout=60))
+        reply = ask_helper(cl.AskUserMessage, content=prompt, timeout=60)
         return reply["content"].strip()
-
-    def send(
-        self,
-        message: Union[Dict, str],
-        recipient: Agent,
-        request_reply: Optional[bool] = None,
-        silent: Optional[bool] = False,
-    ) -> bool:
-        cl.run_sync(
-            cl.Message(
-                content=f'*Sending message to "{recipient.name}":*\n\n{message}',
-                author=self.name,
-            ).send()
-        )
-        return super().send(
-            message=message,
-            recipient=recipient,
-            request_reply=request_reply,
-            silent=silent,
-        )
 
 # RAG function
 def rag(query: str) -> str:
@@ -174,6 +175,26 @@ async def on_chat_start():
         content="Welcome to the Enhanced Mental Health Assistant. How can I help you today?"
     ).send()
 
+# @cl.on_message
+# async def on_message(message: cl.Message):
+#     manager = cl.user_session.get("manager")
+#     user_proxy = cl.user_session.get("user_proxy")
+
+#     if message.content.lower() in ['exit', 'quit', 'end', 'bye']:
+#         await cl.Message(
+#             content="Thank you for using the Mental Health Assistant. Take care!"
+#         ).send()
+#         return
+
+#     # Start conversation with user proxy
+#     def initiate_chat():
+#         user_proxy.initiate_chat(
+#             manager,
+#             message=f"User input: {message.content}\nAssess the situation, decide on the next step, and respond accordingly.",
+#         )
+
+#     await cl.make_async(initiate_chat)()
+
 @cl.on_message
 async def on_message(message: cl.Message):
     manager = cl.user_session.get("manager")
@@ -185,11 +206,9 @@ async def on_message(message: cl.Message):
         ).send()
         return
 
-    # Start conversation with user proxy
-    def initiate_chat():
-        user_proxy.initiate_chat(
-            manager,
-            message=f"User input: {message.content}\nAssess the situation, decide on the next step, and respond accordingly.",
-        )
-
-    await cl.make_async(initiate_chat)()
+    # Run initiate_chat in a separate thread using asyncio.to_thread
+    await asyncio.to_thread(
+        user_proxy.initiate_chat,
+        manager,
+        message=f"User input: {message.content}\nAssess the situation, decide on the next step, and respond accordingly.",
+    )

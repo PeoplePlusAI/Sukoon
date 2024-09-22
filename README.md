@@ -39,6 +39,15 @@ setx OPENAI_API_KEY "your_api_key_here"
 ```
 
 
+# Progress:
+```
+We first tried crew ai agent framework which worked well for prototype. (see - https://www.crewai.com/)
+We then tried langgraph framework as this was proven to be more robust in production. Both its backend and frontend are built.  (see - https://www.langchain.com/langgraph)
+After consulting Bharath(who has worked on AI agents earlier), we decided to shift to Autogen framework. (see - https://microsoft.github.io/autogen/docs/tutorial/introduction/)
+However we’re having issues with its web UI ( see github chainlit issues, ors). Also it’s having agent loop issues. 
+As next steps, we’ll try to create API endpoints for langgraph (which we had built earlier) and then integrate with whatsapp API. 
+For user testing now, we’re using Gooey.ai (which is following exact logic for user flow as used in Autogen and Langgraph) & doing prompt iteration.
+```
 
 # Current Landscape
 Currently availing mental health has a lot of issues such as:

@@ -25,7 +25,7 @@ On Windows -
 setx OPENAI_API_KEY "your_api_key_here"
 ```
 
-Documentation:
+### Documentation:
 Please see this article to understand how Autogen works - https://microsoft.github.io/autogen/docs/Getting-Started
 
 ## Understanding and Debugging AutoGen
@@ -51,6 +51,80 @@ Key features:
 4. **UserProxyAgent**: Represents the human user or serves as an interface for human input.
 
 5. **AssistantAgent**: AI-powered agents that perform tasks or provide information.
+
+## How we are using Autogen?
+
+_please see this technical architecture doc for more details - https://www.figma.com/board/ZxX5XSxZDyxYJCFHBI9m6S/Process-Flow?node-id=4974-451&t=RfyoSQeC79Cv7XLI-1 
+
+### Key Components
+
+1. **Autogen Library**: We use Autogen to create and manage multiple AI agents, each with specific roles in the mental health support process.
+
+2. **Chainlit**: Provides the frontend for user interaction, rendering the chat interface and handling user inputs.
+
+3. **RAG (Retrieval-Augmented Generation)**: Implemented to provide agents with access to relevant mental health information using llama index.
+
+### Agent Structure
+
+The system consists of several specialized agents:
+
+1. **ChainlitUserProxyAgent (User)**: 
+   - Represents the human user in the system.
+   - Configured to always require human input.
+   - Limits automatic replies to prevent overwhelming the user.
+
+2. **ChainlitAssistantAgent (PlannerAgent)**:
+   - Acts as the central coordinator.
+   - Assesses the situation and decides which specialized agent should respond.
+
+3. **ChainlitAssistantAgent (EmpatheticAgent)**:
+   - Provides empathetic responses and emotional support.
+
+4. **ChainlitAssistantAgent (SuicidePreventionAgent)**:
+   - Specialized in handling crisis situations and suicide prevention.
+
+5. **ChainlitAssistantAgent (RolePlayingAgent)**:
+   - Engages in role-playing scenarios to help users practice interactions.
+
+Each agent is initialized with a specific system message (prompt) that defines its role and behavior. The `llm_config` parameter sets the language model configuration for each agent.
+
+### RAG Integration
+
+All assistant agents are equipped with a RAG function, allowing them to retrieve relevant mental health information. This is implemented using:
+
+```python
+for agent in [planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent]:
+    agent.register_for_llm(
+        description="Retrieve content related to mental health topics using RAG.",
+        api_style="function"
+    )(rag)
+```
+
+### Group Chat and Manager
+
+The agents are organized into a group chat:
+
+```python
+groupchat = autogen.GroupChat(
+    agents=[user_proxy, planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent],
+    messages=[],
+    max_round=15,
+    speaker_selection_method="auto",
+)
+
+manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
+```
+
+The `GroupChat` sets up the interaction between agents, while the `GroupChatManager` oversees the conversation flow.
+
+### Conversation Flow
+
+1. User input is received through the Chainlit interface.
+2. The input is passed to the UserProxyAgent.
+3. The GroupChatManager directs the conversation to the PlannerAgent.
+4. The PlannerAgent assesses the situation and decides which specialized agent should respond.
+5. The chosen agent (Empathetic, SuicidePrevention, or RolePlaying) generates a response, potentially using the RAG function for additional information.
+6. The response is sent back through the Chainlit interface to the user.
 
 ## Common Debugging Issues and Solutions
 
@@ -103,47 +177,6 @@ Key features:
    - Use AutoGen's built-in conversation saving features to analyze conversations post-execution.
 
 Remember, AutoGen is highly customizable. Many issues can be resolved by subclassing existing components and implementing custom logic to suit your specific needs.
-
-# Current Landscape
-Currently availing mental health has a lot of issues such as:
-Stigma -  In India, mental health issues are not considered as healthcare issues. Any person suffering from mental issues is considered weak. Stigma and discrimination often undermine social support structures. Persons suffering from such issues are often tagged as ‘lunatics’ by society. This leads to a vicious cycle of shame, suffering and isolation of the patients.
-Lack of awareness - leading to issues like undetected issues and self diagnosis
-Availability of trained Mental Healthcare Personnel: There is a severe shortage of mental healthcare workforce in India. According to the WHO, in 2011, there were 0.301 psychiatrists and 0.047 psychologists for every 100,000 patients suffering from a mental health disorder in India. In contrast, the ratio in most developed countries is in excess of 10.
-Affordability - Most Mental healthcare sessions are costly as per Indian incomes, hence out of reach of most population(~95%)
-Budgetary Constraints - Low budget Allocation: Developed countries allocate 5-18% of their annual healthcare budget on mental healthcare, while India allocates roughly 0.05% (Organization for Economic Co-operation and Development, 2014) of its healthcare budget. This is the lowest among all G20 countries. Despite a rise in mental illness issues, the Union Ministry of Health allocated less than 1% of its budget to directly deal with psychological illnesses in 2022.
-
-# Proposed Solution
-AI Companion
-Solves for personalization, accessibility (available 24/7), affordability
-
-# Features:
-Personalized and contextual responses 
-Emotional understanding and support
-Privacy-focused, with no central data storage 
-Supplemental real healthcare professional support → Escalation features
-Multi-user chat interface capabilities with option to invite partner / parent → Shared wellness journey
-Cultural Sensitivity in Indian context
-
-# What could a solution look like? (Tentative features) 
-Very personal approach with focus on listening and emphasising
-Available in 22 Indic regional languages, especially on mobile devices
-Stores the user conversation locally, not on cloud -> ensuring complete privacy
-Will provide helpful resources for most common mental health problems. However, it'll not prescribe any medicines
-For training the bot , we can use federated learning
-Will be available as an API, so interested people can try this and build on top of it, based on their use case
-Aim is to get national-level adoption
-If serious, there’ll option to reach out to a psychiatrist or support community groups e.g. peer to peer network
-Have L1/L2/L3 level of support 
-
-# Some interesting ideas to try: 
-Can we gamify the whole conversation? If yes, then how? 
-Can we nudge users to adopt healthier behaviour? 
-In particular, we can warn users about what not to do - relying on superstitions, isolation, labelling, and other unhelpful tactics
-Give positive self-affirmation, create safety plan, etc
-Can we develop Emotional Intelligence that understands not just emotions, but context behind it
-Can we detect emotional status ike stress level using voice(like hume) and then support him
-Can we create a timeline tracker let’s say six month plan for meditation and track streak
-Can we give them a phone number they can call to? The bot will mainly listen , empathize and offer safe advice
 
 Please read the full doc and feel free to add comments here - https://docs.google.com/document/d/1H8-oJmMy0r28kYup9vqt8VGDlY_cCFW_2M07XJxWpFU/edit?usp=sharing 
 

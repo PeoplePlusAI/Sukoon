@@ -49,6 +49,15 @@ setx OPENAI_API_KEY "your_api_key_here"
 6. For user testing now, we’re using Gooey.ai (which is following exact logic for user flow as used in Autogen and Langgraph) & doing prompt iteration.
 ```
 
+# How to contribute
+There are few ways you can contribute to Sukoon
+
+By providing feedback on the POC
+By raising issues in the issues section
+By contributing to the codebase based on the issues
+Join the Sukoon team by filling the p+ai volunteer form (https://peopleplus.ai/volunteer) and select the Sukoon project.
+Do a PR in the respective branch like 'autogen' or 'langgraph'.
+
 # Current Landscape
 Currently availing mental health has a lot of issues such as:
 Stigma -  In India, mental health issues are not considered as healthcare issues. Any person suffering from mental issues is considered weak. Stigma and discrimination often undermine social support structures. Persons suffering from such issues are often tagged as ‘lunatics’ by society. This leads to a vicious cycle of shame, suffering and isolation of the patients.

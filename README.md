@@ -5,7 +5,7 @@
 - [Vision](#Vision)
 - [Project Progress](#Project-Progress)
 - [Steps to run](#Steps-to-run)
-- [Contributing](#contributing)
+- [Contributing](#How-to-contribute)
 - [Documentation](#documentation)
 - [Issues](#issues)
 - [Pull Requests](#pull-requests)

@@ -1,5 +1,16 @@
 # Project Sukoon: Mental-Health-Support-using-AI
 
+## Table of Contents
+
+- [Vision](#Vision)
+- [Project Progress](#Project-Progress)
+- [Steps to run](#Steps-to-run)
+- [Contributing](#contributing)
+- [Documentation](#documentation)
+- [Issues](#issues)
+- [Pull Requests](#pull-requests)
+- [Volunteer](#volunteer)
+
 ## Vision
 We aim to build open-source solutions and standards for using AI to solve mental health challenges. Our goal is to apply DPI (Digital Public Infrastructure) knowledge and practices to help professionals deeply explore and understand the latest advancements in AI and how they can be applied to mental health use-cases specific to India.
 
@@ -58,6 +69,15 @@ There are few ways you can contribute to Sukoon
 - Join the Sukoon team by filling the p+ai volunteer form (https://peopleplus.ai/volunteer) and select the Sukoon project.
 - Submit PRs to the respective branches (e.g. 'autogen' or 'langgraph')
 
+For detailed guidelines, please read the guidelines outlined in CONTRIBUTING.md
+
+The docs folder contains overall project documentation and related documents. To access or contribute to the documentation, please refer to docs/README.md.
+e.g Please read the main doc here and feel free to add comments here - https://docs.google.com/document/d/1H8-oJmMy0r28kYup9vqt8VGDlY_cCFW_2M07XJxWpFU/edit?usp=sharing 
+
+## Issues
+
+If you encounter any issues with the project, please create a new issue using the issue template. Provide as much detail as possible to help us understand and resolve the issue.
+
 # Current Challenges
 We have two active discussions:
 ```
@@ -95,4 +115,4 @@ Mental health support in India faces several challenges:
 * Can we create a timeline tracker let’s say six month plan for meditation and track streak
 * Can we give them a phone number they can call to? The bot will mainly listen , empathize and offer safe advice
 
-Please read the full doc and feel free to add comments here - https://docs.google.com/document/d/1H8-oJmMy0r28kYup9vqt8VGDlY_cCFW_2M07XJxWpFU/edit?usp=sharing 
+“Made for 🇮🇳 with ❤️ by People+AI”

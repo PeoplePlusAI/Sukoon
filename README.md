@@ -52,11 +52,11 @@ setx OPENAI_API_KEY "your_api_key_here"
 # How to contribute
 There are few ways you can contribute to Sukoon
 
-By providing feedback on the POC
-By raising issues in the issues section
-By contributing to the codebase based on the issues
-Join the Sukoon team by filling the p+ai volunteer form (https://peopleplus.ai/volunteer) and select the Sukoon project.
-Do a PR in the respective branch like 'autogen' or 'langgraph'.
+- By providing feedback on the POC
+- By raising issues in the issues section
+- By contributing to the codebase based on the issues
+- Join the Sukoon team by filling the p+ai volunteer form (https://peopleplus.ai/volunteer) and select the Sukoon project.
+- Do a PR in the respective branch like 'autogen' or 'langgraph'.
 
 # Current Landscape
 Currently availing mental health has a lot of issues such as:

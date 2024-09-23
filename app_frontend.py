@@ -116,7 +116,7 @@ def rag(query: str) -> str:
     response = query_engine.query(query)
     return str(response)
 
-# Create agents
+# agents
 user_proxy = ChainlitUserProxyAgent(
     name="User",
     human_input_mode="ALWAYS",

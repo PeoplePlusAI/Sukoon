@@ -9,10 +9,38 @@ from llama_index.core import (
     load_index_from_storage,
 )
 
-# from autogen import ConversableAgent
+from autogen import AssistantAgent, UserProxyAgent, config_list_from_json
+from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+# error: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
+# Get environment variables
+API_KEY = os.getenv("API_KEY")
+MODEL_NAME = os.getenv("MODEL_NAME")
+PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
+
+# Check if required environment variables are set
+if not all([API_KEY, MODEL_NAME, PORTKEY_API_KEY]):
+    raise ValueError("Missing required environment variables. Please check your .env file.")
+
+config = [
+    {
+        "api_key": API_KEY,  # alt: ANTHROPIC_VIRTUAL_KEY
+        "model": MODEL_NAME,  # alt: claude sonnet 3.5
+        "base_url": PORTKEY_GATEWAY_URL,
+        "api_type": "openai",
+        "default_headers": createHeaders(
+            api_key=PORTKEY_API_KEY,
+            provider="openai",
+            trace_id="empathetic_agent"  # Add individual trace-id for your agent
+        )
+    }
+]
 # Configure the agents
-config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
-llm_config = {"config_list": config_list, "timeout": 60, "temperature": 0.7}
+# config_list = autogen.config_list_from_json("OAI_CONFIG_LIST")
+llm_config = {"config_list": config, "timeout": 60, "temperature": 0.7}
 
 # os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
 

@@ -1,0 +1,349 @@
+# Project Sukoon 
+## DPI for Mental Health Support
+
+Fill up the linked form or reach out to Luv Singh or Tanisha Sheth to join this working group. 
+
+Join the WhatsApp group here - [Whatsapp Chat Group](#) and find the use cases document here: [Use Cases](#)
+
+### Table of Contents
+1. [Vision](#vision)
+2. [Current Landscape](#current-landscape)
+3. [Proposed Solution](#proposed-solution)
+4. [Use Cases](#use-cases)
+5. [Implementation Plan](#implementation-plan)
+6. [Goal](#goal)
+7. [Challenges](#challenges)
+8. [Sample User Personas](#sample-user-personas)
+9. [Statistics](#statistics)
+10. [References](#references)
+
+### Vision
+We want to build open-source solutions and standards using AI to address mental health challenges in India. Our goal is to apply Digital Public Infrastructure (DPI) principles to create accessible, scalable, and effective mental health support systems for individuals, organisations, and professionals in India. By fostering innovation and collaboration, we seek to revolutionise mental health care using the latest advancements in AI, tailored specifically to the Indian context.
+
+### Current Landscape 
+Over the last few years, there has been a growing focus on Mental Health in India. More people are openly talking about their experiences with therapy, more employers are providing mental health benefits, and more public figures are sharing their experiences with mental health conditions. As the need deepens, the delivery of these services is moving online – in the form of AI-led apps, teleconsults, and online support groups.
+
+### Proposed Solution
+Currently, availing mental health has a lot of issues such as:
+- **Stigma**: Mental health issues are not considered healthcare issues in India.
+- **Availability of trained Mental Healthcare Personnel**: There is a severe shortage of mental healthcare workforce.
+- **Affordability**: Most mental healthcare sessions are costly as per Indian incomes.
+- **Aggravating factors**: Social media impact, COVID-19 lockdown effects, etc.
+- **Lack of awareness**: Leads to undetected issues and self-diagnosis.
+- **Budgetary Constraints**: Low budget allocation for mental healthcare.
+
+### Use Cases
+- **Workplace**: Support for employees in crisis.
+- **Educational Institutions**: Awareness and support for students.
+- **Public Health**: Aid for mental health patients (e.g., early screening).
+- **Family Settings**: Tools to resolve family issues.
+- **Elderly folk**: Companion to solve for loneliness.
+
+### Implementation Plan
+1. Build a working prototype for one use case (e.g., solving anxiety).
+2. Research the most common pain points on deploying such solutions.
+3. Conduct user research across the initial use cases.
+4. Decide the best way to host a solution (WhatsApp, Telegram, Web App).
+5. Design a front-end UI/UX for user testing.
+6. Develop the tech stack and APIs required for the solution.
+7. Build a go-to-market strategy.
+
+### Goal 
+How can AI and tech help individuals work functionally and progressively in their lives?
+
+### Challenges
+- Handling bias in solutions.
+- Adding Indian cultural context.
+- Personalization of the experience.
+- Long-term memory and retrieval of contextual information.
+
+### Sample User Personas
+- **Rahul**: A first-year college student facing emotional issues.
+- **Pooja Kumari**: A working mother suffering from loneliness.
+
+### Statistics
+1. Suicide is the second leading cause of death for young people aged 15-29 years.
+2. The WHO reports that 5.6 crore Indians suffer from depression.
+3. India needs an additional 27,000 psychiatrists based on the current population.
+
+Link to User Research Survey - https://tally.so/r/mRzgRQ (Please share among your circle)
+
+Possible Options:-
+AI Companion
+Solves for personalization, accessibility (available 24/7), affordability
+
+Features:
+Personalized and contextual responses 
+Emotional understanding and support
+Privacy-focused, with no central data storage 
+Supplemental real healthcare professional support → Escalation features
+Multi-user chat interface capabilities with option to invite partner / parent → Shared wellness journey
+Cultural Sensitivity in Indian context
+What could a solution look like? (Tentative features) 
+Very personal approach with focus on listening and emphasising
+Available in 22 Indic regional languages, especially on mobile devices
+Stores the user conversation locally, not on cloud -> ensuring complete privacy
+Will provide helpful resources for most common mental health problems. However, it'll not prescribe any medicines
+For training the bot , we can use federated learning
+Will be available as an API, so interested people can try this and build on top of it, based on their use case
+Aim is to get national-level adoption
+If serious, there’ll option to reach out to a psychiatrist or support communi Ji ty groups e.g. peer to peer network
+Have L1/L2/L3 level of support [2] (source: CDPI )
+
+Ideas to Explore: 
+Can we gamify the whole experience like conversation? If yes, then how? 
+Can we integrate our cultural elements like ayurveda, yoga and like in this? 
+Can we nudge users to adopt healthier behaviour? 
+In particular, we can warn users about what not to do - relying on superstitions, isolation, labelling, and other unhelpful tactics
+Give positive self-affirmation, create safety plan, etc
+Can we integrate nutrition based approach or bio-sensor to wellbeing?
+Can we develop Emotional Intelligence that understands not just emotions, but context behind it
+Can we detect emotional status ike stress level using voice(like hume) and then support him
+Can we create a timeline tracker let’s say six month plan for meditation and track streak
+Can we give them a phone number they can call to? The bot will mainly listen , empathize and offer safe advice
+Can we develop AI agents for psychologists (or person interested in seeking help) to run simulations? For psychologists they may find useful behaviors/reactions by creating large scale simulations and identify patterns to find future directions of addressing mental health. For person seeking help, it may be useful for them to identify how their/others behavior is impacting their mental health.
+Can we have a stress / wellness score could prove effective. A lot of startups are doing this in Europe - Adds measurability to the mix, which consumers love.
+Can we develop  an agent to tell stories of individuals who have overcome similar challenges.
+
+
+Implementation Plan
+Build a working prototype for one use case - say solving anxiety. 
+Research the most common pain points on deploying such solutions
+Conduct user research across the initial use cases to understand their behaviour
+Decide the best way to host a solution like this — will it be a Whatsapp/ Telegram/ Web App
+Design a front-end UI/UX that users can test the prototype on
+Develop the tech stack and APIs required to build this solution — which LLM, Language Translation API, Hosting Platform, Server, etc
+Build a go-to-market deck and strategy and model for this solution
+Privacy and Safeguards — The data shared is sensitive personal information. Using principles of federated learning and anonymisation, data would be kept private. 
+Modularity to ensure each component of the system can evolve independently and can be swapped with another component if needed.
+
+Figma link of User Journey and Technical Architecture -  Figma
+
+### Challenges
+ 
+Handling bias in Solutions it offers
+Adding Indian cultural context 
+How to make it more personalised
+Long term memory and retrieval of contextual information - Storing conversation data points  - especially if it’s long 
+If I say on Day 1 that I just had a break-up and on Day 3, I say I am feeling extremely helpless, it should be able to ask me whether the reason is because of my break-up rather than me having to tell it 
+A fix could be using an "Adverse Life Event" List and flagging those when mentioned
+
+Success Metrics: 
+Educational Training for Friends/Family:
+Improvement in Knowledge Retention and Support Effectiveness:
+Measure the improvement in knowledge retention and the quality of support provided by friends and family, indicated by pre-and post-training assessments and positive feedback (e.g., knowledge retention improvement from 60% to 85% and positive support feedback from 70% to 95%).
+KPIs to Quantify  
+This can be done through short evaluation quizzes at the end of the educational modules
+Earlier, NIMHANS training materials could reach 500 people, with this reach extends ten fold; questions are answered through conversational AI 
+
+
+Self-Help App for College Students Dealing with Anxiety:
+Combined Mental Health and Academic Performance Improvement:
+Measure the improvement in, say, academic performance (e.g., marks increase) among app users, indicating overall wellness enhancement (e.g., we can track suicide rate reduction from 5 per 100,000 to 2 per 100,000)
+
+
+NIMHANS Helpline Voice AI Solution:
+Percentage of Calls Correctly Triaged to Psychiatric Care:
+Measure the increase in the percentage of calls triaged to psychiatric care from baseline to post-implementation, ensuring a higher proportion of serious cases are prioritized (e.g., from 30% to 90%).
+
+
+Screening/Triage Solution:
+Increase in the Number of Individuals Served and Reduction in Wait Times:
+Measure the increase in the number of individuals screened and served combined with a reduction in wait times for accessing mental health services (e.g., individuals served per month increasing from 500 to 2,000)
+
+## Project Timeline
+
+6-week Sprint
+Week 1 & 2: Identify use-case and come up with proposed solution 
+Assign tasks and create working groups
+Consult with practitioners (psychologists, therapists)
+Identify relevant stakeholders for use case 
+Eg. If we identify use case to be college students, we should also reach out college administrators / educators and get them involved in project so they can test out solution at their respective institutions 
+Week 3 & 4: Build out identified solution
+Strategize GTM so when product is built distribution is ready
+Does this start with a small target group or we implement at multiple schools at a time etc. 
+Week 5: Go-to-market with solution
+Week 6: Iterate on feedback
+Project Volunteers
+Technical / Coding
+Tanisha Banik
+Luv Singh
+Krishna Den
+Sandeep Srinivasan
+Monica Shityalkar
+Sid Parida 
+Shimanta Krishna 
+Dasari Pranay 
+Neelanjan Manna 
+Muskan Gupta
+Gnanapoongkothai Annamalai
+Vivek Kumar
+Kshitij Dwivedi
+Yashwardhan Sable 
+Srihari Akula (MLOPs)
+
+Subdivision - Frontend, Backend, Database, MLOPs, etc
+
+Product Strategy / Marketing
+Sehj Kashyap
+Pratik Godhani 
+Madhuri Maram
+Ashutosh Dash
+Deepak Rao
+Namrata Singh
+Prakash Seshadri Nathan
+Niharika Vasumitra
+Surya V
+Adarsh Agarwal
+Sid Parida
+Mathew George
+Aanchal
+Brinda Laddha
+Shashwat S.
+
+
+Product Design / UIUX
+Nilesh Modak
+Apar Maniar
+Medha
+Jiya Garg
+
+User Research
+Kunal Patil
+Ashank Agarwal
+Chandan Praveen Pathi
+Karthik Mahadevan
+Rohit Kumar
+Sahiti Penna
+Rajneesh Verma
+Adarsh Agarwal
+Namrata Singh
+Tanisha Banik
+Medha (i can help with both ux and research)
+Aanchal
+Brinda Laddha
+Jiya Garg
+
+Doctors / Therapists
+Sunita Bohra (Psychologist)
+Akanksha (Psychologist)
+Sakshi Sethia (Psychiatrist)
+Manish Kondapuram (Radiologist @ AIIMS)
+
+
+QR code for sharing this - 
+
+
+
+##Tech questions- 
+How do we train the bot - e.g do we go for PEFT type Finetuning on datasets & will it help develop Indian cultural context
+How to ensure complete privacy? 
+Locally running LLM or inference on cloud eg Groq? Should we have an anonymisation layer that will make user data completely private before sending it to cloud?
+Do we use RAG like mechanism to provide helpful resources or knowledge graph to provide personalisation or similar matches?
+How to run it locally, especially on mobile devices eg using Phi3, llama3
+
+High-level break-up of capabilities:
+Voice recognition → Capturing Information required → Conversational flow
+Need ASR in regional languages 
+Agent to do CTA → Browse web  → find relevant information → Suggest Helpful Action
+Need strong guardrails to avoid adverse cases
+[2] Explanation of L1/L2/L3 level of support (source : CDPI)
+Level 1 (L1): Immediate Support
+Purpose: Provide instant access to helpful resources.
+Example: Support for a child who failed an exam.
+Features: 24x7 availability of Indian context-specific, verified information through a RAG-based system (Retrieval Augmentated Generation).
+Level 2 (L2): Professional Guidance / Counsellor Support
+Purpose: Address more serious issues like abuse, ADHD.
+Features: Anonymized and guided access to professionals who are experts in handling such cases.
+Level 3 (L3): Community Support
+Purpose: Complement L1 and L2 with community engagement.
+Features:
+Helpline: Talk to individuals who have faced similar challenges.
+Online Community: Share and listen to stories, focusing on coping strategies.
+
+
+## Assumptions - 
+
+People want to talk to AI based assistants for their emotional worries
+People know what they want when they talk to AI based therapists
+References
+We could also include a section on responsible and ethical AI practices. An example of the guidelines: https://main.icmr.nic.in/sites/default/files/upload_documents/Ethical_Guidelines_AI_Healthcare_2023.pdf 
+Github Link [WIP] - https://github.com/PeoplePlusAI/Mental-Health-Support-using-AI 
+Market Size - Estimated potential market size of the Indian Mental Health care industry (including online and online) is ~$3billion (Rs 2500 crore)
+LLM Principles - https://woebothealth.com/ai-core-principles/ 
+Bias in AI data used for health
+Omdena Chapter - https://www.omdena.com/projects/developing-a-chatbot-based-support-system-for-mental-health 
+Emerging work - 
+https://www.peakmind.in/ ; 
+https://www.wysa.com/ 
+For collaborations, we tried reaching out to few orgs(response awaited) - 
+MPOWER - mpower.outreach@abet.co.in
+NIMHANS - ms@nimhans.ac.in
+S.A.R.A.H - World Health Organization (WHO) announces the launch of S.A.R.A.H., a digital health promoter prototype with enhanced empathetic response powered by generative artificial intelligence (AI). S.A.R.A.H. is a Smart AI Resource Assistant for Health that represents an evolution of AI-powered health information avatars, using new language models and cutting-edge technology. It can engage users 24 hours a day in 8 languages on multiple health topics on any device.
+Using AI for training people in Mental health first Aid - eg https://www.mhfa.com.au/ 
+
+<there’s a separate document for this but adding it here for reference>
+Use Cases
+1. NIMHANS Helpline AI Chatbot
+The NIMHANS Helpline AI Chatbot is designed to alleviate the workload on mental health practitioners by intelligently screening and filtering incoming calls. It uses voice AI to distinguish between psychiatric and non-psychiatric cases, ensuring that only relevant cases reach human specialists. This solution enhances the efficiency of the helpline, allowing practitioners to focus on providing care to those most in need.
+Currently, Telemanas receives 5L calls / year and 70% of them are non-psychiatric.
+Development: Collaborate with AI developers to design a chatbot capable of understanding and responding to diverse mental health-related inquiries.
+Integration: Seamlessly integrate the chatbot into the existing helpline’s IT infrastructure to ensure smooth operation and easy access for users.
+Training: Program the chatbot using a vast dataset of typical inquiries to recognize the difference between psychiatric and non-psychiatric calls accurately.
+Pilot Testing: Initially deploy the chatbot to handle a small portion of the traffic to monitor its effectiveness and make adjustments as needed. Human oversight included.
+Full Deployment: Gradually increase the chatbot’s load as it proves effective, while keeping human oversight to handle complex cases or failures.
+Monitoring and Evaluation: Continuously collect data on chatbot performance and user satisfaction, using this information to refine the AI’s responses and capabilities.
+2. Self-Help App for College Students
+This mobile app targets college students dealing with anxiety, offering them a suite of tools including AI-powered talk therapy simulations and mental health first aid training. Talk therapy is proven to be most effective when it comes to anxiety and so this is designed to be an early intervention tool, the app provides immediate support and teaches coping mechanisms, while also offering a pathway to escalate concerns to professional therapists as needed. It’s a private, accessible resource for students to manage and improve their mental health.
+Design and Development: Build the app with user-friendly interfaces, prioritizing privacy and data security. 
+Collaboration: Work with mental health professionals and educators to ensure content accuracy and relevancy.
+Potential Partner: Youth ki Awaaz, College like IITs and Schools, Private Players like Coaching Centres(e.g. Kota), 
+User Testing: Conduct focus groups and beta testing with a select group of students to gather feedback and refine the app.
+Clinical Study
+This needs to be designed along with psychologists / practitioners
+Conduct GAD-7 / PHQ-9 Surveys for select group of users 
+Roll out app to treatment student group and measure outcomes vis-a-vis control group
+See if scores have improved in positive direction post 3/4/6 months 
+Launch: Officially release the app on multiple platforms to reach a broad audience of college students.
+Ongoing Support and Updates: Regularly update the app with new content and features based on user feedback and advancements in mental health care practices.
+Impact Evaluation: Periodically assess the app’s effectiveness in improving mental health among college students through surveys and usage analytics.
+3. Mental health first aid - Support for Friends and Family
+This educational platform trains friends and family of individuals having mental health issues (or general in too) by equipping them with the necessary knowledge and skills to offer support effectively. It includes interactive guides, scenario-based training, and a supportive community forum, all designed to enhance understanding and improve communication around mental health care. The platform helps create a more supportive environment for those struggling with mental health issues. The app might use ‘AI agents’ to train normal people to better provide mental health first aids.
+Content Creation: Develop comprehensive guides and training modules on how to support someone with mental health issues, involving experts in the field.
+Platform Development: Build an interactive online platform or app that includes training modules, real-life scenarios, and a community forum.
+Pilot Program: Launch a pilot to a small group of users to refine the educational content and platform functionality.
+Full Scale Launch: Roll out the platform to a wider audience, promoting it through community centers, schools, and social media.
+Community Management: Maintain and moderate the community to ensure a supportive and respectful environment.
+Feedback and Iteration: Use user feedback and engagement data to continuously improve the platform’s content and features.
+4. Screening and Triage Solution
+Our digital triage system streamlines the process of identifying and directing individuals to the appropriate mental health resources through a simple, user-friendly questionnaire accessible via QR code. This solution aids in quickly assessing mental health needs and efficiently connects individuals with the necessary care pathways, reducing wait times and improving overall access to mental health services. It’s an essential tool for clinics and health providers aiming to optimize mental health triage.
+Questionnaire: Collaborate with mental health professionals to roll out clinically validated, multilingual diagnostic surveys
+Can potentially be done with Docst
+Technology Setup: Develop a simple, user-friendly digital interface for the questionnaire that can be accessed via QR code.
+Integration: Ensure the system integrates smoothly with healthcare providers’ electronic health records (EHR) systems for efficient data sharing and referral processing.
+Pilot Testing: Test the system in a controlled environment to refine the questionnaire and tech functionality.
+Can be done by putting QR codes in AIIMS
+Deployment: Implement the screening system in selected clinics and hospitals, and expand based on the success and feedback from these initial locations.
+Continuous Monitoring and Optimization: Regularly review the system’s effectiveness in triaging and directing patients, and make necessary adjustments to improve accuracy and user experience.
+
+
+
+
+
+
+## Appendix -
+
+
+Statistics - 
+1. Suicide is the second leading cause of death for young people aged 15-29 years, with more deaths due to suicide in this age group than to interpersonal violence.
+2. The World Health Organization (WHO) reports that 5.6 crore Indians suffer from depression and 3.8 crore from anxiety disorders.
+3. In 2017, 45.7 million of the population (42.4-49.8) suffered from depression, and it is projected to become more prevalent due to urbanization and modernization.
+4. A research published in the Lancet in October 2021 found a 35% increase in mental health disorders in India.
+5. The National Mental Health Survey 2015-16 estimates that 10.6% of Indians over the age of 18 suffer from mental morbidity, excluding tobacco-related diseases.
+6. India needs an additional 27,000 psychiatrists, 37,000 psychiatric nurses, 38,000 psychiatric social workers, and 38,000 clinical psychologists based on the current population.
+7. The Indian Psychiatric Society recommends a minimum of three psychiatrists per 100,000 people, but India currently has only 0.75 psychiatrists per 100,000 inhabitants.
+8. The Ministry of Health and Family Welfare reported that the nation has only 898 clinical psychologists and only 1,500 psychiatric nurses compared to a demand of 30,000.
+9. The WHO reports that countries spend less than 2% of their health care budgets on mental health on average, resulting in only a small percentage of those who require mental health treatment having access to effective, affordable, and high-quality care
+
+
+

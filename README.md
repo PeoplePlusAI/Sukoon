@@ -27,7 +27,7 @@ Hey, Welcome to contributing to this open source project to solve Mental health.
 
 # Steps to run 🛠️
 
-Diagram Fig 1.1: ![Showing Technical Archtecture](https://drive.google.com/uc?export=view&id=17DZhYkjvloPOsqfnIxC3llZ4zvh5-pEf)
+Diagram Fig 1.1: ![Showing-Technical-Archtecture](archive/agent_arch.png)
 
 AutoGen (Current Version)
 ```

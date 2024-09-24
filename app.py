@@ -34,7 +34,9 @@ config = [
         "default_headers": createHeaders(
             api_key=PORTKEY_API_KEY,
             provider="openai",
-            trace_id="empathetic_agent"  # Add individual trace-id for your agent
+            trace_id="peopleplusai",
+            span_id="13",
+            span_name="Agent_Call"            
         )
     }
 ]
@@ -43,6 +45,23 @@ config = [
 llm_config = {"config_list": config, "timeout": 60, "temperature": 0.7}
 
 # os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
+
+# logging feedback
+# from portkey_ai import Portkey
+# portkey = Portkey(
+#     api_key="PORTKEY_API_KEY",
+#     virtual_key="VIRTUAL_KEY"
+# )
+
+# feedback = portkey.feedback.create(
+#     trace_id="TRACE_ID",
+#     value=5,  # Integer between -10 and 10
+#     weight=1,  # Optional
+#     metadata={
+#         # Pass any additional context here like comments, _user and more
+#     }
+# )
+# print(feedback)
 
 # load YAML file
 def load_prompts(file_path='prompts.yaml'):

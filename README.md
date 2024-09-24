@@ -47,6 +47,8 @@ Note: if you're getting SQL Lite error, please open a github issue.
 - alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app
 ```
 
+Fig 2: ![Simplified-Architecture](archive/arch_1.png)
+
 ## Steps to add environment variables - 
 Create a .env file with:
 ```

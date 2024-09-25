@@ -20,7 +20,7 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
-
+VIRTUAL_KEY = os.getenv("PORTKEY_VIRTUAL_KEY")
 # Check if required environment variables are set
 if not all([API_KEY, MODEL_NAME, PORTKEY_API_KEY]):
     raise ValueError("Missing required environment variables. Please check your .env file.")
@@ -47,21 +47,21 @@ llm_config = {"config_list": config, "timeout": 60, "temperature": 0.7}
 # os.environ["AUTOGEN_USE_DOCKER"] = "0/False/no" # False
 
 # logging feedback
-# from portkey_ai import Portkey
-# portkey = Portkey(
-#     api_key="PORTKEY_API_KEY",
-#     virtual_key="VIRTUAL_KEY"
-# )
+from portkey_ai import Portkey
+portkey = Portkey(
+    api_key=PORTKEY_API_KEY,
+    virtual_key=VIRTUAL_KEY
+)
 
-# feedback = portkey.feedback.create(
-#     trace_id="TRACE_ID",
-#     value=5,  # Integer between -10 and 10
-#     weight=1,  # Optional
-#     metadata={
-#         # Pass any additional context here like comments, _user and more
-#     }
-# )
-# print(feedback)
+feedback = portkey.feedback.create(
+    trace_id="1347",
+    value=5,  # Integer between -10 and 10
+    weight=1,  # Optional
+    # metadata={
+    #     # Pass any additional context here like comments, _user and more
+    # }
+)
+print(f"\n{feedback}\n")
 
 # load YAML file
 def load_prompts(file_path='prompts.yaml'):

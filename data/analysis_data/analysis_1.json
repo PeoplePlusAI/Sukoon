@@ -1,0 +1,121 @@
+[
+  {
+    "user_analysis": {
+      "primary_concern": "exam pressure and fear of failure due to backlogs",
+      "subject_category": "Emotional Support",
+      "emotional_tone": "anxious and overwhelmed"
+    },
+    "sukoon_response_evaluation": {
+      "empathy_rating": 4,
+      "relevance_rating": 5,
+      "clarity_rating": 5,
+      "helpfulness_rating": 4,
+      "overall_rating": 4.5,
+      "strengths": [
+        "Demonstrates understanding of the user's feelings",
+        "Encourages breaking down the problem into smaller steps",
+        "Provides practical suggestions for improvement"
+      ],
+      "areas_for_improvement": [
+        "Could offer more specific examples or resources",
+        "Might ask more about the user's specific backlogs to tailor advice"
+      ],
+      "suggested_follow_up": "What specific topic do you feel would be most manageable to review right now?"
+    }
+  },
+  {
+    "user_analysis": {
+      "primary_concern": "Feeling neutral or indifferent",
+      "subject_category": "Emotional Support",
+      "emotional_tone": "Neutral"
+    },
+    "sukoon_response_evaluation": {
+      "empathy_rating": 4,
+      "relevance_rating": 5,
+      "clarity_rating": 5,
+      "helpfulness_rating": 4,
+      "overall_rating": 4.5,
+      "strengths": [
+        "Demonstrates understanding of the user's feelings",
+        "Asks open-ended questions to facilitate further discussion",
+        "Validates the user's emotional state"
+      ],
+      "areas_for_improvement": [
+        "Could provide examples of what 'feeling more' might mean",
+        "Might include a statement about how common it is to feel neutral"
+      ],
+      "suggested_follow_up": "How do you usually cope with this neutral feeling, or is there something specific you wish to change about it?"
+    }
+  },
+  {
+    "user_analysis": {
+      "primary_concern": "Seeking information or clarification",
+      "subject_category": "Other",
+      "emotional_tone": "Frustration"
+    },
+    "sukoon_response_evaluation": {
+      "empathy_rating": 2,
+      "relevance_rating": 3,
+      "clarity_rating": 4,
+      "helpfulness_rating": 2,
+      "overall_rating": 2.75,
+      "strengths": [
+        "Promotes a safe space for mental well-being",
+        "Encourages mindfulness with 'Namaste'"
+      ],
+      "areas_for_improvement": [
+        "Could provide more specific guidance or information",
+        "Should directly address the user's question"
+      ],
+      "suggested_follow_up": "Could ask the user to elaborate on what specific information they are seeking."
+    }
+  },
+  {
+    "user_analysis": {
+      "primary_concern": "desperation for help or information",
+      "subject_category": "Crisis Management",
+      "emotional_tone": "urgent and serious"
+    },
+    "sukoon_response_evaluation": {
+      "empathy_rating": 4,
+      "relevance_rating": 5,
+      "clarity_rating": 5,
+      "helpfulness_rating": 3,
+      "overall_rating": 4.25,
+      "strengths": [
+        "Acknowledged the user's urgency",
+        "Maintained focus on mental health support",
+        "Encouraged further discussion on mental health concerns"
+      ],
+      "areas_for_improvement": [
+        "Could provide more direct resources or support options",
+        "Might consider asking a more open-ended question to explore the user's feelings"
+      ],
+      "suggested_follow_up": "Can you share more about what you're feeling or experiencing that makes you say your life depends on it?"
+    }
+  },
+  {
+    "user_analysis": {
+      "primary_concern": "happiness and emotional well-being",
+      "subject_category": "Emotional Support",
+      "emotional_tone": "hopeful"
+    },
+    "sukoon_response_evaluation": {
+      "empathy_rating": 4,
+      "relevance_rating": 4,
+      "clarity_rating": 5,
+      "helpfulness_rating": 3,
+      "overall_rating": 4,
+      "strengths": [
+        "Sukoon acknowledges the user's feelings and desire for happiness.",
+        "The response encourages self-reflection on happiness.",
+        "Clear communication and understanding of its role."
+      ],
+      "areas_for_improvement": [
+        "Could provide more direct emotional support or coping strategies.",
+        "Might offer alternative ways to find happiness or joy."
+      ],
+      "suggested_follow_up": "Sukoon could ask, 'What activities or moments in your life have brought you happiness recently?'"
+    }
+  }
+]

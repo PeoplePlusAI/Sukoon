@@ -82,25 +82,37 @@ async def process_query(request: SukoonRequest):
             "input": request.input,
             "intermediate_steps": request.intermediate_steps
         })
+
+        # Extract agent output
+        agent_out = out.get("agent_out")
+
         # Handle different types of agent output
-        if isinstance(out["agent_out"], AgentFinish):
-            result = out["agent_out"].return_values
-        elif isinstance(out["agent_out"], dict):
-            result = out["agent_out"]
+        if isinstance(agent_out, AgentFinish):
+            # Extract return_values from AgentFinish
+            result = agent_out.return_values
+        elif isinstance(agent_out, dict):
+            result = agent_out
         else:
             # If it's neither AgentFinish nor a dict, use a default structure
-            result = {"answer": str(out["agent_out"]), "source": "Unknown"}
-        
+            result = {"answer": str(agent_out), "source": "Unknown"}
+
         # Format the full output
-        formatted_output = json.loads(json.dumps(out, indent=2, default=str))
-        
+        # Remove the AgentFinish object before serialization
+        out_serializable = out.copy()
+        if isinstance(agent_out, AgentFinish):
+            out_serializable["agent_out"] = agent_out.return_values
+        else:
+            out_serializable["agent_out"] = agent_out
+
+        formatted_output = json.loads(json.dumps(out_serializable, indent=2, default=str))
+
         # Extract and format intermediate steps
         intermediate_steps = [
-            {step: pformat(details, indent=2)} 
+            {step: pformat(details, indent=2)}
             for step_dict in out.get("intermediate_steps", [])
             for step, details in step_dict.items()
         ]
-        
+
         return SukoonResponse(
             answer=result.get("answer", "No answer provided"),
             source=result.get("source", ""),
@@ -109,13 +121,55 @@ async def process_query(request: SukoonRequest):
         )
     except Exception as e:
         # Log the error and return a more informative error response
-        # logging.error(f"Error processing query: {str(e)}")
+        logging.error(f"Error processing query: {str(e)}")
         return SukoonResponse(
             answer=f"An error occurred: {str(e)}",
             source="Error",
             intermediate_steps=[],
             full_output={"error": str(e)}
         )
+
+# @app.post("/query", response_model=SukoonResponse)
+# async def process_query(request: SukoonRequest):
+#     try:
+#         out = runnable.invoke({
+#             "input": request.input,
+#             "intermediate_steps": request.intermediate_steps
+#         })
+#         # Handle different types of agent output
+#         if isinstance(out["agent_out"], AgentFinish):
+#             result = out["agent_out"].return_values
+#         elif isinstance(out["agent_out"], dict):
+#             result = out["agent_out"]
+#         else:
+#             # If it's neither AgentFinish nor a dict, use a default structure
+#             result = {"answer": str(out["agent_out"]), "source": "Unknown"}
+        
+#         # Format the full output
+#         formatted_output = json.loads(json.dumps(out, indent=2, default=str))
+        
+#         # Extract and format intermediate steps
+#         intermediate_steps = [
+#             {step: pformat(details, indent=2)} 
+#             for step_dict in out.get("intermediate_steps", [])
+#             for step, details in step_dict.items()
+#         ]
+        
+#         return SukoonResponse(
+#             answer=result.get("answer", "No answer provided"),
+#             source=result.get("source", ""),
+#             intermediate_steps=intermediate_steps,
+#             full_output=formatted_output
+#         )
+#     except Exception as e:
+#         # Log the error and return a more informative error response
+#         # logging.error(f"Error processing query: {str(e)}")
+#         return SukoonResponse(
+#             answer=f"An error occurred: {str(e)}",
+#             source="Error",
+#             intermediate_steps=[],
+#             full_output={"error": str(e)}
+#         )
 '''
 # printing in nice format
 import pprint

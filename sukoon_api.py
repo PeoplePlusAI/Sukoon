@@ -121,7 +121,7 @@ async def process_query(request: SukoonRequest):
         )
     except Exception as e:
         # Log the error and return a more informative error response
-        logging.error(f"Error processing query: {str(e)}")
+        # logging.error(f"Error processing query: {str(e)}")
         return SukoonResponse(
             answer=f"An error occurred: {str(e)}",
             source="Error",

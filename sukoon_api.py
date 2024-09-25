@@ -20,6 +20,7 @@ from sukoon import (
     final_answer_tool,
     search_tool,
     planner_agent_runnable,
+    role_play_tool,  # Add this import
 )
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -92,7 +93,7 @@ async def process_query(request: SukoonRequest):
         ]
         return SukoonResponse(
             answer=result["answer"],
-            source=result["source"],
+            source=result.get("source", ""),  # Add a default value
             intermediate_steps=intermediate_steps,
             full_output=formatted_output
         )

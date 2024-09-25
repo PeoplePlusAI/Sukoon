@@ -209,27 +209,18 @@ def router(state: dict):
     if re.search(r"how (should|can|do) I (help|deal with|handle|approach)", input_text):
         return "role_play"
     
-    # If the agent output exists and is a list
-    if isinstance(state["agent_out"], list) and state["agent_out"]:
-        tool = state["agent_out"][-1].tool
-        
-        # If the agent explicitly chose role_play
-        if tool == "role_play":
-            return "role_play"
-        
-        # If the agent chose search, but the content might benefit from role play
-        if tool == "search":
-            action = state["agent_out"][-1]
-            if hasattr(action, 'tool_input'):
-                tool_input = action.tool_input.lower()
-                if any(keyword in tool_input for keyword in role_play_keywords):
-                    return "role_play"
-        
-        return tool
+    # Check the agent_out
+    if isinstance(state["agent_out"], AgentFinish):
+        # If it's AgentFinish, we're done
+        return "final_answer"
+    elif isinstance(state["agent_out"], list) and state["agent_out"]:
+        last_action = state["agent_out"][-1]
+        if isinstance(last_action, AgentAction):
+            # If it's an AgentAction, use the tool attribute
+            return last_action.tool
     
     # Default to search if no other conditions are met
     return "search"
-
 
 # def router(state: list):
 #     print("> router")

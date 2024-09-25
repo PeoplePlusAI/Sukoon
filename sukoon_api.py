@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from pprint import pformat
 from langgraph.graph import StateGraph, END
 from langgraph.graph import StateGraph, END
-
+from langchain_core.agents import AgentAction, AgentFinish
 # Import necessary functions and classes from Sukoon project
 from sukoon import (
     AgentState,
@@ -82,24 +82,40 @@ async def process_query(request: SukoonRequest):
             "input": request.input,
             "intermediate_steps": request.intermediate_steps
         })
-        result = json.loads(out["agent_out"])
+        # Handle different types of agent output
+        if isinstance(out["agent_out"], AgentFinish):
+            result = out["agent_out"].return_values
+        elif isinstance(out["agent_out"], dict):
+            result = out["agent_out"]
+        else:
+            # If it's neither AgentFinish nor a dict, use a default structure
+            result = {"answer": str(out["agent_out"]), "source": "Unknown"}
+        
         # Format the full output
         formatted_output = json.loads(json.dumps(out, indent=2, default=str))
+        
         # Extract and format intermediate steps
         intermediate_steps = [
             {step: pformat(details, indent=2)} 
             for step_dict in out.get("intermediate_steps", [])
             for step, details in step_dict.items()
         ]
+        
         return SukoonResponse(
-            answer=result["answer"],
-            source=result.get("source", ""),  # Add a default value
+            answer=result.get("answer", "No answer provided"),
+            source=result.get("source", ""),
             intermediate_steps=intermediate_steps,
             full_output=formatted_output
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
+        # Log the error and return a more informative error response
+        # logging.error(f"Error processing query: {str(e)}")
+        return SukoonResponse(
+            answer=f"An error occurred: {str(e)}",
+            source="Error",
+            intermediate_steps=[],
+            full_output={"error": str(e)}
+        )
 '''
 # printing in nice format
 import pprint

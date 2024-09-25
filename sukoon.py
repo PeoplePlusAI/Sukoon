@@ -142,15 +142,26 @@ def run_planner_agent(state: list):
 def execute_search(state: list):
     print("> execute_search")
     action = state["agent_out"]
+    
+    # Check if action is an AgentFinish
+    if isinstance(action, AgentFinish):
+        return {"intermediate_steps": [{"search": action.return_values.get("answer", "No answer provided")}]}
+    
     tool_call = action[-1].message_log[-1].additional_kwargs["tool_calls"][-1]
     out = search_tool.invoke(
         json.loads(tool_call["function"]["arguments"])
     )
     return {"intermediate_steps": [{"search": str(out)}]}
 
+
 def execute_role_play(state: list):
     print("> execute_role_play")
     action = state["agent_out"]
+    
+    # Check if action is an AgentFinish
+    if isinstance(action, AgentFinish):
+        return {"intermediate_steps": [{"role_play": action.return_values.get("answer", "No answer provided")}]}
+    
     tool_call = action[-1].message_log[-1].additional_kwargs["tool_calls"][-1]
     out = role_play_tool.invoke(
         json.loads(tool_call["function"]["arguments"])
@@ -240,7 +251,12 @@ final_answer_llm = llm.bind_tools([final_answer_tool], tool_choice="final_answer
 def rag_final_answer(state: list):
     print("> final_answer")
     query = state["input"]
-    context = state["intermediate_steps"][-1]
+    
+    # Check if the last state is an AgentFinish
+    if isinstance(state["intermediate_steps"][-1], AgentFinish):
+        context = state["intermediate_steps"][-1].return_values
+    else:
+        context = state["intermediate_steps"][-1]
 
     prompt = f"""You are a helpful assistant, answer the user's question using the
     context provided.
@@ -253,14 +269,20 @@ def rag_final_answer(state: list):
     function_call = out.additional_kwargs["tool_calls"][-1]["function"]["arguments"]
     return {"agent_out": function_call}
 
-# we use the same forced final_answer LLM call to handle incorrectly formatted
-# output from our planner_agent
 def handle_error(state: list):
     print("> handle_error")
     query = state["input"]
+    
+    # Check if the last state is an AgentFinish
+    if isinstance(state["intermediate_steps"][-1], AgentFinish):
+        context = state["intermediate_steps"][-1].return_values
+    else:
+        context = "No context available."
+
     prompt = f"""You are a helpful assistant, answer the user's question.
 
     QUESTION: {query}
+    CONTEXT: {context}
     """
     out = final_answer_llm.invoke(prompt)
     function_call = out.additional_kwargs["tool_calls"][-1]["function"]["arguments"]

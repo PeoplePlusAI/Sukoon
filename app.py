@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # error: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable
 # Get environment variables
-API_KEY = os.getenv("API_KEY")
+API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME")
 PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
 VIRTUAL_KEY = os.getenv("PORTKEY_VIRTUAL_KEY")
@@ -117,14 +117,14 @@ suicide_prevention_agent = autogen.AssistantAgent(
     llm_config=llm_config,
 )
 
-# role_playing_agent = autogen.AssistantAgent(
-#     name="RolePlayingAgent",
-#     system_message=prompts['role_playing_agent_prompt'],
-#     llm_config=llm_config,
-# )
+role_playing_agent = autogen.AssistantAgent(
+    name="RolePlayingAgent",
+    system_message=prompts['role_playing_agent_prompt'],
+    llm_config=llm_config,
+)
 
 # Register the rag function for all agents
-for agent in [planner_agent, empathetic_agent, suicide_prevention_agent]: #role_playing_agent
+for agent in [planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent]:
     agent.register_for_llm(
         description="Retrieve content related to mental health topics using RAG.",
         api_style="function"
@@ -132,11 +132,11 @@ for agent in [planner_agent, empathetic_agent, suicide_prevention_agent]: #role_
 
 # Create a group chat
 groupchat = autogen.GroupChat(
-    agents=[user, planner_agent, empathetic_agent, suicide_prevention_agent], #role_playing_agent
+    agents=[user, planner_agent, empathetic_agent, suicide_prevention_agent, role_playing_agent],
     messages=[],
-    max_round=10,
+    max_round=15,
     speaker_selection_method="auto", # availbale options: round_robin, customized speaker selection function (Callable)
-    allow_repeat_speaker=True, # False
+    allow_repeat_speaker= False, # True
     # allowed_or_disallowed_speaker_transitions={
     #     user: [planner_agent, empathetic_agent, suicide_prevention_agent],
     #     planner_agent: [user, empathetic_agent, suicide_prevention_agent],

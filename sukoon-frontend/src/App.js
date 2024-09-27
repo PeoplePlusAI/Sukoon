@@ -94,9 +94,9 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="chatConv pt-4 pe-4">
-          <div className="mx-auto" style={{ width: "60%" }}>
-            <div className="messages pt-5 mt-4 mx-auto" style={{ height: "75vh" }}>
+        <div class="chatConv pt-4 pe-4" style={{ height: "80vh", overflow: "scroll", overflowX: "auto" }}>
+          <div class="col-7 mx-auto" style={{ overflow: "hidden" }}>
+            <div>
               {messages.map((message, index) => (
                 <p key={index} className={`small p-2 me-3 my-1 rounded-3 ${message.user ? 'bg-primary text-white userMsg' : 'agentMsg'}`}>{message.text}</p>
               ))}
@@ -105,24 +105,20 @@ function App() {
                   <div className="loading-bar"></div>
                 </div>
               )}
-              {/* <p className="small p-2 me-3 my-1 text-white rounded-3 bg-primary userMsg">I need peace of mind!</p>
-              <p className="small p-2 ms-5 my-1 mt-4 rounded-3 text-dark agentMsg">That’s a great goal to have. I hope
-                this project will bring some peace of mind to the people who use it. What kind of features are
-                you planning to include? 😊</p> */}
             </div>
-            <div className="chatAction">
-              <div className="row mx-auto query-action">
-                <div className="input-group mb-3">
-                  <div className="form-floating">
-                    <input type="text" className="w-100 h-100" id="floatingInputGroup1"
-                      placeholder="Type your message..." value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} /></div><span
-                        className="input-group-text d-flex justify-content-center submit" onClick={handleSend}><i
-                          className="fa-solid fa-arrow-up"></i>
+            <div class="chatAction d-flex justify-content-around bd-highlight">
+              <div class="p-2 bd-highlight query-action" style={{ position: "fixed", bottom: "20px" }}>
+                <div class="input-group mb-3" style={{ width: "400px" }}>
+                  <div class="form-floating"><input type="text" class="w-100 h-100" id="floatingInputGroup1"
+                    placeholder="Type your message..." value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} /></div><span
+                      class="input-group-text d-flex justify-content-center submit" onClick={handleSend}><i
+                        class="fa-solid fa-arrow-up"></i>
                   </span>
                 </div>
               </div>
             </div>
           </div>
+          <p ref={messagesEndRef} style={{ display: "ruby-text" }} />
         </div>
       </div>
     </div>

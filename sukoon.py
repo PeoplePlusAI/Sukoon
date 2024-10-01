@@ -27,7 +27,7 @@ class AgentState(TypedDict):
     agent_out : Union[AgentAction, AgentFinish, None] # gives output
     intermediate_steps: Annotated[List[tuple[AgentAction, str]], operator.add] # shows intermediate steps
 
-with open("prompts/sample_data.txt", 'r') as file:
+with open("data/sample_data.txt", 'r') as file:
     data = file.read().strip()
 
 # llama-index function

@@ -24,7 +24,7 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
 6. Conducting user testing using Gooey.ai, following the logic used in AutoGen and LangGraph prompts
 
-![Sukoon-Image](user_research/sukoon_logo.jpg)
+![sukoon pic](user_research/sukoon_pic.jpg)
 
 ## Installation
 

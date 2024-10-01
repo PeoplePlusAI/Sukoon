@@ -26,6 +26,8 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 
 ![sukoon pic](user_research/sukoon_pic.jpg)
 
+[Watch the video](https://drive.google.com/file/d/1zFL8nz0d8aqzHxJhFU0h-ScDdFaSkPeT/view?usp=drive_link)
+
 ## Installation
 
 ### Technical Architecture

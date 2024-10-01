@@ -1,35 +1,39 @@
-# Project Sukoon: Mental-Health-Support-using-AI
+# Project Sukoon: Mental Health Support using AI
 
 ## Table of Contents
 
-- [Vision](#Vision)
-- [Project Progress](#Project-Progress)
-- [Steps to run](#Steps-to-run)
-- [Contributing](#How-to-contribute)
+- [Vision](#vision)
+- [Project Progress](#project-progress)
+- [Installation](#installation)
+- [Contributing](#contributing)
 - [Documentation](#documentation)
 - [Issues](#issues)
 - [Pull Requests](#pull-requests)
 - [Volunteer](#volunteer)
 
 ## Vision
-We aim to build open-source solutions and standards for using AI to solve mental health challenges. Our goal is to apply DPI (Digital Public Infrastructure) knowledge and practices to help professionals deeply explore and understand the latest advancements in AI and how they can be applied to mental health use-cases specific to India.
 
-Hey, Welcome to contributing to this open source project to solve Mental health.
+Project Sukoon aims to build open-source solutions and standards for using AI to address mental health challenges. Our goal is to apply Digital Public Infrastructure (DPI) knowledge and practices to help professionals explore and understand the latest advancements in AI and their applications to mental health use-cases specific to India.
 
 ## 🚀 Project Progress
 
-1. Prototyped with Crew AI agent framework (https://www.crewai.com/)
-2. Developed backend and frontend using LangGraph framework (https://www.langchain.com/langgraph)
-3. Shifted to AutoGen framework based on expert consultation (https://microsoft.github.io/autogen/docs/tutorial/introduction/)
+1. Prototyped with [Crew AI agent framework](https://www.crewai.com/)
+2. Developed backend and frontend using [LangGraph framework](https://www.langchain.com/langgraph)
+3. Shifted to [AutoGen framework](https://microsoft.github.io/autogen/docs/tutorial/introduction/) based on expert consultation
 4. Currently addressing web UI issues and agent loop problems with AutoGen
 5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
-6. Conducting user testing using Gooey.ai, following the logic used in AutoGen and LangGraph prompts.
+6. Conducting user testing using Gooey.ai, following the logic used in AutoGen and LangGraph prompts
 
-# Steps to run 🛠️
+<img src="user_research/sukoon_logo.jpg" alt="Sukoon-Logo" width="300" height="auto">
 
-Diagram Fig 1.1: ![Showing-Technical-Archtecture](archive/agent_arch.png)
+## Installation
 
-AutoGen (Current Version)
+### Technical Architecture
+![Technical Architecture](archive/agent_arch.png)
+
+The main code is present in separate branches using different frameworks: AutoGen (from Microsoft Research) and LangGraph (from Langchain).
+
+AutoGen
 ```
 - Go to autogen branch
 - install all dependencies in your environment (pip install -r requirements.txt)
@@ -38,7 +42,7 @@ AutoGen (Current Version)
 Note: if you're getting SQL Lite error, please open a github issue.
 ```
 
-### LangGraph (First Version)
+### LangGraph (Current Version)
 ```
 - Go to langgraph branch
 - install all dependencies in your environment (pip install -r requirements.txt)

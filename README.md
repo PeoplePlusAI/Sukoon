@@ -1,4 +1,5 @@
 # Project Sukoon: Mental Health Support using AI
+![Sukoon Pic](user_research/sukoon_pic.png){: width="200" height="auto" style="display: block; margin: 0 auto;"}
 
 ## Table of Contents
 
@@ -23,8 +24,6 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 4. Currently addressing web UI issues and agent loop problems with AutoGen
 5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
 6. Conducting user testing using Gooey.ai, following the logic used in AutoGen and LangGraph prompts
-
-![Sukoon Pic](user_research/sukoon_pic.png)
 
 [Watch the video](https://drive.google.com/file/d/1zFL8nz0d8aqzHxJhFU0h-ScDdFaSkPeT/view?usp=drive_link)
 

@@ -1,5 +1,5 @@
 # Project Sukoon: Mental Health Support using AI
-![Sukoon Pic](user_research/sukoon_pic.png){: width="200" height="auto" style="display: block; margin: 0 auto;"}
+<img src="user_research/sukoon_pic.png" alt="Sukoon Pic" width="200" style="display: block; margin: 0 auto;">
 
 ## Table of Contents
 

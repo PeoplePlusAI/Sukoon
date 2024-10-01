@@ -24,7 +24,7 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
 6. Conducting user testing using Gooey.ai, following the logic used in AutoGen and LangGraph prompts
 
-<img src="user_research/sukoon_logo.jpg" alt="Sukoon-Logo" width="300" height="auto">
+![Sukoon-Image](user_research/sukoon_logo.jpg)
 
 ## Installation
 
@@ -33,16 +33,7 @@ Project Sukoon aims to build open-source solutions and standards for using AI to
 
 The main code is present in separate branches using different frameworks: AutoGen (from Microsoft Research) and LangGraph (from Langchain).
 
-AutoGen
-```
-- Go to autogen branch
-- install all dependencies in your environment (pip install -r requirements.txt)
-- run 'python app.py' 
-- Start interacting with AI agents
-Note: if you're getting SQL Lite error, please open a github issue.
-```
-
-### LangGraph (Current Version)
+# LangGraph (Current Version)
 ```
 - Go to langgraph branch
 - install all dependencies in your environment (pip install -r requirements.txt)
@@ -52,6 +43,15 @@ Note: if you're getting SQL Lite error, please open a github issue.
 ```
 
 Fig 2: ![Simplified-Architecture](archive/arch_1.png)
+
+# AutoGen
+```
+- Go to autogen branch
+- install all dependencies in your environment (pip install -r requirements.txt)
+- run 'python app.py' 
+- Start interacting with AI agents
+Note: if you're getting SQL Lite error, please open a github issue.
+```
 
 ## Steps to add environment variables - 
 Create a .env file with:

@@ -77,9 +77,11 @@ def route_query(state: State):
     # Corrected line using format_messages()
     formatted_messages = planner_prompt.format_messages(input=last_message.content)
     response = model.invoke(formatted_messages)
+    print(response)
     # final = response.content.strip().lower()
-    # return {"messages": final}
-    return response
+    state["messages"] = response.content
+    return {"messages": response.content}
+    # return response
 
 def run_conversational_agent(state):
     summary = state.get("summary", "")
@@ -180,7 +182,9 @@ graph = workflow.compile(checkpointer=memory)
 
 # Function to run a conversation turn
 def chat(message: str, config: dict):
-    result = graph.invoke({"messages": [HumanMessage(content=message)]}, config=config)
+    msg = HumanMessage(content=message)
+    # print(msg)
+    result = graph.invoke({"messages": [msg]}, config=config)
     return result["messages"][-1]
 
 # Example usage

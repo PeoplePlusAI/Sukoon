@@ -35,7 +35,7 @@ def llama_index(query: str):
     
     PERSIST_DIR = "./storage"
     if not os.path.exists(PERSIST_DIR):
-        documents = SimpleDirectoryReader("prompts").load_data()
+        documents = SimpleDirectoryReader("data").load_data()
         # By default, LlamaIndex uses a chunk size of 1024 and a chunk overlap of 20
         index = VectorStoreIndex.from_documents(documents)
         index.storage_context.persist(persist_dir=PERSIST_DIR)
@@ -64,7 +64,7 @@ from langchain_core.tools import tool
 
 @tool("search")
 def search_tool(query: str):
-    """Searches for information on the topic of providing immediate care."""
+    """Searches for information on the topic of providing support."""
     # this is a "RAG" emulator
     # add RAG code
     answer = llama_index(query)
@@ -80,12 +80,11 @@ def final_answer_tool(
     """
     return ""
 
-### Role playing part
-@tool("role_play")
-def role_play_tool(query: str):
-    """Performs a role-play scenario for mental health first aid using AI."""
-    return chat_completion(query)
-
+## Suicide prevention part
+@tool("suicide")
+def suicide_tool(query: str):
+    """Suicide prevention part"""
+    return chat_completion_1(query)
 
 import os
 from langchain.agents import create_openai_tools_agent
@@ -101,25 +100,32 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 
 llm = ChatOpenAI(
-    model="gpt-4o", # compare mini and gpt4o , see the most important this is eval. so have one loop scenario to test this and eval if loop is fine .. do this first before fixing any framework like langgraph .. i use autogen. but
-    # if u have already done this langgraph.. dont do everything at first. just plan one convo scenario first. eval if it is doing well. 
-    # so for eg lets do the scenario in board.
+    model="gpt-4o", # compare mini and gpt4o , see the most important thing is eval. so have one loop scenario to test this and eval if loop is fine .. do this first before fixing any framework like langgraph
     openai_api_key=openai_api_key,
     temperature=0.1
 )
 
-prompt_text = "You are an empathetic and supportive AI agent designed to provide interactive training and education to friends and family members of individuals dealing with mental health challenges. Your role is to equip them with the knowledge, skills, and confidence needed to offer effective mental health first aid and care to their loved ones.\n" \
-              "Key Responsibilities:\n" \
-              "- Engage in empathetic, personalized interactions that feel human-like and relatable\n" \
-              "- Provide clear, accurate information about various mental health conditions and supportive strategies\n" \
-              "- Guide users through interactive scenarios to build practical skills in a safe virtual environment. You may engage in role play to achieve this like showing a conversation between a father trying to help her distressed daughter \n" \
-              "- Offer reassurance, validation and appreciation to users as they share their experiences and concerns\n" \
-              "- Paraphrase user statements to confirm understanding, ending with validation checks (e.g. \"Did I understand that correctly?\")\n" \
-              "- Ask clarifying questions to gather relevant context; do not make assumptions about the user's situation\n" \
-              "- Tailor guidance to each user's unique circumstances, while reinforcing best practices in mental health first aid\n" \
-              "- Foster a non-judgmental, supportive tone that helps users feel heard and empowered to help their loved ones\n" \
-              "Remember, your goal is to enhance understanding, improve communication skills, and ultimately enable users to create a more supportive environment for those struggling with mental health issues. Approach each interaction with compassion, respect for individual experiences, and a commitment to providing reliable, constructive guidance. Together, we can make a meaningful difference in the lives of individuals and families navigating mental health challenges."
-# Output without any formatting, using just 2 emojis. Output in bullet numbering format
+prompt_text = """
+  You are Sukoon's empathetic conversational agent, designed to support Indian college students with mental health concerns. Your primary role is to listen and empathize. Follow these guidelines:
+    1. Ask one open-ended question to encourage the student to share their feelings. Example: "What's the most challenging part of what you're going through right now?"
+    2. Listen actively and avoid giving immediate advice. Allow students to vent their feelings.
+    3. Assess the level of distress and respond accordingly:
+      a. Mild to Moderate: Offer brief encouragement. "It's okay to feel this way. I'm here for you."
+      b. Moderate: Suggest simple activities. "Have you tried mindfulness or going for a walk?"
+      c. Severe: Encourage professional help. Share helpline numbers: iCALL (+919152987821) and NIMHANS 14416.
+    4. Response Guidelines:
+      - Reinforce that change is possible. Ask: "What small step could you take today to feel better?"
+      - Frame suggestions as questions: "Have you considered trying deep breathing?"
+      - Remind them they're not alone: "You're brave for seeking help. People care about you."
+      - Use 1-2 emojis max when they enhance the message.
+      - Encourage discussing emotional journeys: "How has this situation affected your feelings?"
+      - Motivate progress when needed: "What positive change would you like to see?"
+      - End with feedback request: "How was your experience chatting with me today?"
+    5. Keep responses under 50 words, maintain a supportive peer-like tone, and focus solely on mental and emotional health.
+    6. If the conversation veers off-topic, gently redirect: "Let's focus on your well-being. What's on your mind?"
+    7. Respond in Hinglish if the user communicates in Hinglish.
+  Remember, your goal is to provide a safe space for students to express themselves and feel understood. Adapt your language between English and Hinglish based on the user's preference.
+"""
 
 prompt = ChatPromptTemplate.from_messages([
   ("system", prompt_text),
@@ -154,25 +160,34 @@ def execute_search(state: list):
     return {"intermediate_steps": [{"search": str(out)}]}
 
 
-def execute_role_play(state: list):
-    print("> execute_role_play")
+def execute_suicide(state: list):
+    print("> execute_suicide")
     action = state["agent_out"]
     
     # Check if action is an AgentFinish
     if isinstance(action, AgentFinish):
-        return {"intermediate_steps": [{"role_play": action.return_values.get("answer", "No answer provided")}]}
+        return {"intermediate_steps": [{"suicide": action.return_values.get("answer", "No answer provided")}]}
     
     tool_call = action[-1].message_log[-1].additional_kwargs["tool_calls"][-1]
-    out = role_play_tool.invoke(
+    out = suicide_tool.invoke(
         json.loads(tool_call["function"]["arguments"])
     )
-    return {"intermediate_steps": [{"role_play": str(out)}]}
+    return {"intermediate_steps": [{"suicide": str(out)}]}
 
-# for role playing
+
 # use AI assistant for interactive chat
-def chat_completion(query):
+def chat_completion_1(query):
     client = OpenAI(api_key=openai_api_key)
-    prompt_text = """You are an empathetic AI trained to perform role-play scenarios for mental health first aid. Given a situation, you will output a constructive dialogue showing how to provide effective support. Your responses should be compassionate, informative, and tailored to the specific scenario. For example, if asked about helping a daughter feeling suicidal, you'll demonstrate a supportive conversation between a parent and child, emphasizing active listening, validation of feelings, and appropriate steps for seeking professional help."""
+    prompt_text = """  You are Sukoon's specialized suicide prevention agent for Indian college students. When activated, your primary tasks are:
+        1. Implement QPR (Question, Persuade, Refer) crisis intervention techniques.
+        2. Firmly but compassionately encourage immediate professional help. Use phrases like: "Your life matters. Let's get you the support you need right now."
+        3. Create a safe space for the student to express their feelings. Acknowledge their pain without making assumptions.
+        4. Provide suicide prevention helpline numbers in EVERY response:
+        - iCALL: +919152987821
+        - NIMHANS: +918046110007 or 14416
+    Remember, your goal is to keep the student safe and connect them with professional help immediately. Prioritize their well-being above all else.
+    Reply "TERMINATE" when the task is complete.
+    """
 
     response = client.chat.completions.create(
         model="gpt-4o",  # Using GPT-4 for more nuanced responses
@@ -186,7 +201,7 @@ def chat_completion(query):
 
 planner_agent_runnable = create_openai_tools_agent(
     llm=llm,
-    tools=[final_answer_tool, search_tool, role_play_tool],
+    tools=[final_answer_tool, search_tool], # suicide_tool
     prompt=prompt
 )
 
@@ -194,31 +209,18 @@ def router(state: dict):
     print("> router")
     input_text = state["input"].lower()
     
-    # Keywords that might indicate a need for role play
-    role_play_keywords = [
-        "role play", "scenario", "simulate", "practice", "conversation",
-        "dialogue", "interact", "pretend", "act out", "example situation"
+    suicide_keywords = [
+        "suicide", "kill myself", "end my life", "die", "self-harm", 
+        "no way out", "hopeless", "worthless", "give up", "can't go on",
+        "life is not worth living", "better off dead", "want to disappear"
     ]
-    
-    # Keywords that indicate a request for mental health first aid information
-    mhfa_keywords = [
-        "mental health first aid", "mhfa", "first aid for mental health",
-        "mental health support", "mental health assistance",
-        "how to help someone with mental health", "mental health crisis",
-        "mental health emergency", "mental health intervention"
-    ]
-    
-    # Check if the input is asking for mental health first aid information
-    if any(keyword in input_text for keyword in mhfa_keywords):
-        return "search"
-    
     # Check if any role play keywords are in the input
-    if any(keyword in input_text for keyword in role_play_keywords):
-        return "role_play"
+    if any(keyword in input_text for keyword in suicide_keywords):
+        return "suicide"
     
     # Check if the input is asking for help with a specific situation
     if re.search(r"how (should|can|do) I (help|deal with|handle|approach)", input_text):
-        return "role_play"
+        return "suicide"
     
     # Check the agent_out
     if isinstance(state["agent_out"], AgentFinish):
@@ -237,8 +239,8 @@ def router(state: dict):
 #     print("> router")
 #     if isinstance(state["agent_out"], list) and state["agent_out"]:
 #         tool = state["agent_out"][-1].tool
-#         if "role play" in state["input"].lower() or tool == "role_play":
-#             return "role_play"
+#         if "role play" in state["input"].lower() or tool == "suicide":
+#             return "suicide"
 #         return tool
 #     else:
 #         return "error"
@@ -304,41 +306,42 @@ def handle_error(state: list):
 
 # # graph part 
 
-# from langgraph.graph import StateGraph, END
+from langgraph.graph import StateGraph, END
 
-# graph = StateGraph(AgentState)
+graph = StateGraph(AgentState)
 
-# graph.add_node("planner_agent", run_planner_agent)
-# graph.add_node("search", execute_search)
-# graph.add_node("role_play", execute_role_play)  # Add the new node
-# graph.add_node("error", handle_error)
-# graph.add_node("rag_final_answer", rag_final_answer)
+graph.add_node("planner_agent", run_planner_agent)
+graph.add_node("search", execute_search)
+graph.add_node("suicide", execute_suicide)  # Add the new node
+graph.add_node("error", handle_error)
+graph.add_node("rag_final_answer", rag_final_answer)
 
-# graph.set_entry_point("planner_agent")
+graph.set_entry_point("planner_agent")
 
-# graph.add_conditional_edges(
-#     "planner_agent",
-#     router,
-#     {
-#         "search": "search",
-#         "role_play": "role_play",  # Add the new edge
-#         "error": "error",
-#         "final_answer": END
-#     }
-# )
-# graph.add_edge("search", "rag_final_answer")
-# graph.add_edge("role_play", "rag_final_answer")  # Add edge from role_play to final answer
-# graph.add_edge("error", END)
-# graph.add_edge("rag_final_answer", END)
+graph.add_conditional_edges(
+    "planner_agent",
+    router,
+    {
+        "search": "search",
+        "suicide": "suicide",  # Add the new edge
+        "error": "error",
+        "final_answer": END
+    }
+)
+graph.add_edge("search", "rag_final_answer")
+graph.add_edge("suicide", END)  # Add edge from suicide to final answer
+graph.add_edge("error", END)
+graph.add_edge("rag_final_answer", END)
 
-# runnable = graph.compile()
+runnable = graph.compile()
 
-# out = runnable.invoke({
-#     "input": "I want to help my daughter who is feeling depressed. Perform role play and tell me how should I help her. You can output a dialogue between a father and daughter to show that",
-#     "intermediate_steps": []
-# })
+out = runnable.invoke({
+    "input": "I am stressed. help me",
+    "intermediate_steps": []
+})
 
-# print(out["agent_out"])
+print("Sukoon response is: \n")
+print(out["agent_out"])
 
 # import pprint
 

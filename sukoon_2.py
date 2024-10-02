@@ -335,6 +335,16 @@ graph.add_edge("rag_final_answer", END)
 
 runnable = graph.compile()
 
+# Get user input
+user_input = input("Hey, what do you need help with: ")
+
+# Update the input in the runnable.invoke() call
+out = runnable.invoke({
+    "input": user_input,
+    "intermediate_steps": []
+})
+
+
 out = runnable.invoke({
     "input": "I am stressed. help me",
     "intermediate_steps": []

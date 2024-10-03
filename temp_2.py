@@ -1,9 +1,10 @@
 from langgraph.graph import MessagesState, StateGraph, START, END
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, RemoveMessage
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.prebuilt import tools_condition, ToolNode
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import Output
 from langchain_core.tools import tool
 from typing import TypedDict
 import os
@@ -23,7 +24,7 @@ LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 
 # Define the state
 class State(MessagesState):
-    summary: str = ""
+    summary: str
 
 # Initialize OpenAI model
 model = ChatOpenAI(model="gpt-4o", temperature=0.7)
@@ -52,7 +53,7 @@ llm_with_tools = model.bind_tools(tools)
 
 # Planner/Router Agent
 planner_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a planner agent that decides which specialized agent to call based on the user's input. If the query indicates a risk of suicide or self-harm, output 'suicide_prevention'. Otherwise, output 'conversational'"),
+    ("system", "You are a planner agent that decides which specialized agent to call based on the user's input. If the query indicates a risk of suicide or self-harm, direct to the Suicide Prevention Agent. Otherwise, direct to the Empathetic Conversational Agent."),
     ("human", "{input}"),
 ])
 
@@ -95,8 +96,8 @@ def route_query(state: State):
 
     # Return the updated route in the state
     return {"messages": response}
-
-
+    # return response
+# Define the logic to call the model
 def run_conversational_agent(state):
     summary = state.get("summary", "")
     if summary:
@@ -128,27 +129,36 @@ def run_suicide_prevention_agent(state):
 
 
 def summarize_conversation(state):
-    if state['summary']:
+    # First, we get any existing summary
+    summary = state.get("summary", "")
+
+    # Create our summarization prompt 
+    if summary:
+        
+        # A summary already exists
         summary_message = (
-            f"This is a summary of the conversation to date: {state.summary}\n\n"
+            f"This is summary of the conversation to date: {summary}\n\n"
             "Extend the summary by taking into account the new messages above:"
         )
+        
     else:
         summary_message = "Create a summary of the conversation above:"
-    
+
+    # Add prompt to our history
     messages = state["messages"] + [HumanMessage(content=summary_message)]
     response = model.invoke(messages)
-    # Update the state's summary with the new summary
-    state["summary"] = response.content
-    return {}  # Return an empty dict or the updated state if necessary
+    
+    # Delete all but the 2 most recent messages
+    delete_messages = [RemoveMessage(id=m.id) for m in state["messages"][:-2]]
+    return {"summary": response.content, "messages": delete_messages}
 
 # Add a new function to handle the routing after the conversational agent
 def should_continue(state):
     if len(state["messages"]) > 15:
-        return {"messages": state["messages"]}, END
+        return END
     if len(state["messages"]) > 6:
-        return {"messages": state["messages"]}, "summarize_conversation"
-    return {"messages": state["messages"]}, "router"
+        return "summarize_conversation"
+    return "router"
 
 # Create the graph
 workflow = StateGraph(State)
@@ -164,67 +174,49 @@ workflow.add_node("should_continue", should_continue)
 workflow.add_edge(START, "router")
 workflow.add_conditional_edges(
     "router",
-    lambda state: state.get("route", "unknown"),
+    route_query,
     {
-        "suicide_prevention": "suicide_prevention",
         "conversational": "conversational",
-        "unknown": END  # Or handle 'unknown' as needed
+        "suicide_prevention": "suicide_prevention"
     }
 )
 workflow.add_conditional_edges(
     "conversational",
     tools_condition,
     {
-        "continue": "should_continue",  # Use the node name as a string
+        "continue": "should_continue",
         "tools": "conversational"
     }
 )
 workflow.add_conditional_edges(
     "should_continue",
-    lambda x: x,
+    should_continue,
     {
-        "router": "router",
         "summarize_conversation": "summarize_conversation",
+        "conversational": "conversational",
         "end": END
     }
 )
 workflow.add_edge("suicide_prevention", END)
-workflow.add_edge("summarize_conversation", "router")
+workflow.add_edge("summarize_conversation", "conversational")
 
 # Compile the graph
 memory = MemorySaver()
 graph = workflow.compile(checkpointer=memory)
 
 # Function to run a conversation turn
-def chat(config: dict):
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() in ["exit", "quit"]:
-            print("Bot: Goodbye!")
-            break
-        msg = HumanMessage(content=user_input)
-        result = graph.invoke({"messages": [msg]}, config=config)
-        # Extract the latest AI response
-        ai_messages = [m for m in result["messages"] if isinstance(m, AIMessage)]
-        if ai_messages:
-            response = ai_messages[-1]
-            print(f"Bot: {response.content}")
-        else:
-            print("Bot: [No response]")
-
-        # Optionally, check if the conversation should end based on graph state
-        if result.get("status") == "ended":
-            print("Bot: Conversation has ended.")
-            break
+def chat(message: str, config: dict):
+    msg = HumanMessage(content=message)
+    # print(msg)
+    result = graph.invoke({"messages": [msg]}, config=config)
+    return result["messages"][-1]
 
 # Example usage
 if __name__ == "__main__":
-    config = {"configurable": {"thread_id": "1"}}
+    config = {"configurable": {"thread_id": "test"}}
     
-    # response = chat("Hi! I'm feeling really stressed about my exams", config)
-    # print("Bot:", response.content)
+    response = chat("Hi! I'm feeling really stressed about my exams", config)
+    print("Bot:", response.content)
     
-    # response = chat("I don't know if I can handle this stress anymore", config)
-    # print("Bot:", response.content)
-    
-    chat(config)
+    response = chat("I don't know if I can handle this stress anymore", config)
+    print("Bot:", response.content)

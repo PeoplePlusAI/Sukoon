@@ -1,5 +1,5 @@
 from langgraph.graph import MessagesState, StateGraph, START, END
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, RemoveMessage
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.prebuilt import tools_condition, ToolNode
@@ -52,7 +52,7 @@ llm_with_tools = model.bind_tools(tools)
 
 # Planner/Router Agent
 planner_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a planner agent that decides which specialized agent to call based on the user's input. If the query indicates a risk of suicide or self-harm, output 'suicide_prevention'. Otherwise, output 'conversational'"),
+    ("system", "You are a planner agent that decides which specialized agent to call based on the user's input. If the query mentions suicide or hints towards it, direct to the Suicide Prevention Agent. Otherwise, direct to the Empathetic Conversational Agent."),
     ("human", "{input}"),
 ])
 
@@ -86,9 +86,9 @@ def route_query(state: State):
     # Determine the route based on the response content
     final = response.content.strip().lower()
     if "suicide prevention agent" in final:
-        state["route"] = "suicide_prevention"
+        state["route"] = final
     elif "conversational agent" in final:
-        state["route"] = "conversational"
+        state["route"] = final
     else:
         # Handle unexpected cases if necessary
         state["route"] = "unknown"
@@ -139,16 +139,22 @@ def summarize_conversation(state):
     messages = state["messages"] + [HumanMessage(content=summary_message)]
     response = model.invoke(messages)
     # Update the state's summary with the new summary
-    state["summary"] = response.content
-    return {}  # Return an empty dict or the updated state if necessary
+    # state["summary"] = response.content
+    # return {}  # Return an empty dict or the updated state if necessary
+     # Delete all but the 2 most recent messages
+    delete_messages = [RemoveMessage(id=m.id) for m in state["messages"][:-2]]
+    return {"summary": response.content, "messages": delete_messages}
 
 # Add a new function to handle the routing after the conversational agent
 def should_continue(state):
+    updates = {"messages": state["messages"]}
     if len(state["messages"]) > 15:
-        return {"messages": state["messages"]}, END
-    if len(state["messages"]) > 6:
-        return {"messages": state["messages"]}, "summarize_conversation"
-    return {"messages": state["messages"]}, "router"
+        updates["status"] = "ended"
+        return updates, END
+    elif len(state["messages"]) > 6:
+        return updates, "summarize_conversation"
+    else:
+        return updates, "router"
 
 # Create the graph
 workflow = StateGraph(State)
@@ -212,7 +218,7 @@ def chat(config: dict):
         else:
             print("Bot: [No response]")
 
-        # Optionally, check if the conversation should end based on graph state
+        # Check if the conversation should end
         if result.get("status") == "ended":
             print("Bot: Conversation has ended.")
             break

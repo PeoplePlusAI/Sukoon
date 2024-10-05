@@ -185,17 +185,18 @@ workflow.add_conditional_edges(
         "tools": "conversational"
     }
 )
+workflow.add_edge("conversational", "should_continue")
 workflow.add_conditional_edges(
     "should_continue",
-    lambda x: x,
+    should_continue,
     {
-        "router": "router",
         "summarize_conversation": "summarize_conversation",
-        "end": END
+        "conversational": "conversational",
+        END: END
     }
 )
 workflow.add_edge("suicide_prevention", END)
-workflow.add_edge("summarize_conversation", "router")
+workflow.add_edge("summarize_conversation", "conversational")
 
 # Compile the graph
 memory = MemorySaver()
@@ -203,26 +204,32 @@ graph = workflow.compile(checkpointer=memory)
 
 # Function to run a conversation turn
 def chat(config: dict):
+    state = {}
     while True:
         user_input = input("You: ")
         if user_input.lower() in ["exit", "quit"]:
             print("Bot: Goodbye!")
             break
-        msg = HumanMessage(content=user_input)
-        result = graph.invoke({"messages": [msg]}, config=config)
+        # Initialize state['messages'] if it doesn't exist
+        if 'messages' not in state:
+            state['messages'] = []
+        # Add the user message to the state
+        state['messages'].append(HumanMessage(content=user_input))
+        # Invoke the graph with the current state
+        result = graph.invoke(state, config=config)
+        # Update the state with the result
+        state.update(result)
         # Extract the latest AI response
-        ai_messages = [m for m in result["messages"] if isinstance(m, AIMessage)]
+        ai_messages = [m for m in state["messages"] if isinstance(m, AIMessage)]
         if ai_messages:
             response = ai_messages[-1]
             print(f"Bot: {response.content}")
         else:
             print("Bot: [No response]")
-
         # Check if the conversation should end
         if result.get("status") == "ended":
             print("Bot: Conversation has ended.")
             break
-
 # Example usage
 if __name__ == "__main__":
     config = {"configurable": {"thread_id": "1"}}

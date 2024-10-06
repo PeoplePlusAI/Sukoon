@@ -1,12 +1,13 @@
+from pydantic import BaseModel, Field
 from langgraph.graph import MessagesState, StateGraph, START, END
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, RemoveMessage
+from langgraph.graph.message import AnyMessage, add_messages
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.prebuilt import tools_condition, ToolNode
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph import Output
 from langchain_core.tools import tool
-from typing import TypedDict
+from typing import TypedDict, Literal, Annotated, List
 import os
 
 from llama_index.core import (
@@ -23,9 +24,10 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
 
 # Define the state
-class State(MessagesState):
-    summary: str
-
+# class State(MessagesState):
+#     summary: str
+class State(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
 # Initialize OpenAI model
 model = ChatOpenAI(model="gpt-4o", temperature=0.7)
 
@@ -72,60 +74,84 @@ suicide_prevention_prompt = ChatPromptTemplate.from_messages([
 # Define node functions
 
 def route_query(state: State):
-    messages = state["messages"]
-    last_message = messages[-1]
+    class RouteQuery(BaseModel):
+          """Route a user query to the most relevant node."""
+          route: Literal["conversational", "suicide_prevention"] = Field(
+              ...,
+              description="Given a user question choose to route it to normal conversation or a suicide prevention.",
+          )
+    structured_llm_router = model.with_structured_output(RouteQuery)
+    question_router = planner_prompt | structured_llm_router
+    last_message = state["messages"][-1]
+    resp = question_router.invoke({"input": last_message})
+    return resp.route
 
-    # Format the planner prompt
-    formatted_messages = planner_prompt.format_messages(input=last_message.content)
-    response = model.invoke(formatted_messages)
-    print(response)
+# def route_query(state: State):
+#     messages = state["messages"]
+#     last_message = messages[-1]
 
-    # Append the response to messages as an AIMessage
-    state["messages"].append(AIMessage(content=response.content))
-    # messages = [AIMessage(content=response.content)]
-    # state["summary"] = response.content
-    # Determine the route based on the response content
-    final = response.content.strip().lower()
-    if "suicide prevention agent" in final:
-        state["route"] = "suicide_prevention"
-    elif "conversational agent" in final:
-        state["route"] = "conversational"
-    else:
-        # Handle unexpected cases if necessary
-        state["route"] = "unknown"
+#     # Format the planner prompt
+#     formatted_messages = planner_prompt.format_messages(input=last_message.content)
+#     response = model.invoke(formatted_messages)
+#     print(response)
 
-    # Return the updated route in the state
-    return {"messages": response}
+#     # Append the response to messages as an AIMessage
+#     state["messages"].append(AIMessage(content=response.content))
+#     # messages = [AIMessage(content=response.content)]
+#     # state["summary"] = response.content
+#     # Determine the route based on the response content
+#     final = response.content.strip().lower()
+#     if "suicide prevention agent" in final:
+#         state["route"] = "suicide_prevention"
+#     elif "conversational agent" in final:
+#         state["route"] = "conversational"
+#     else:
+#         # Handle unexpected cases if necessary
+#         state["route"] = "unknown"
+
+#     # Return the updated route in the state
+#     return {"messages": response}
     # return response
 # Define the logic to call the model
-def run_conversational_agent(state):
-    summary = state.get("summary", "")
-    if summary:
-        # Include the summary as a system message
-        system_message = SystemMessage(content=f"Summary of conversation earlier: {summary}")
-        messages = [system_message] + state["messages"]
-    else:
-        messages = state["messages"]
+# def run_conversational_agent(state):
+#     summary = state.get("summary", "")
+#     if summary:
+#         # Include the summary as a system message
+#         system_message = SystemMessage(content=f"Summary of conversation earlier: {summary}")
+#         messages = [system_message] + state["messages"]
+#     else:
+#         messages = state["messages"]
     
-    # Format the conversational prompt with the latest user message
-    last_message = state["messages"][-1]
-    formatted_messages = conversational_prompt.format_messages(input=last_message.content)
+#     # Format the conversational prompt with the latest user message
+#     last_message = state["messages"][-1]
+#     formatted_messages = conversational_prompt.format_messages(input=last_message.content)
     
-    # Combine messages and formatted prompt
-    full_messages = messages + formatted_messages
-    response = model.invoke(full_messages)
-    return {"messages": state["messages"] + [AIMessage(content=response.content)]}
+#     # Combine messages and formatted prompt
+#     full_messages = messages + formatted_messages
+#     response = model.invoke(full_messages)
+#     return {"messages": state["messages"] + [AIMessage(content=response.content)]}
 
+def run_conversational_agent(state: State):
+    print("Running conversational agent")
+    convo_model = conversational_prompt | model
+    response = convo_model.invoke(state["messages"])
+    return {"messages": response}
 
-def run_suicide_prevention_agent(state):
-    # Format the suicide prevention prompt with the latest user message
-    last_message = state["messages"][-1]
-    formatted_messages = suicide_prevention_prompt.format_messages(input=last_message.content)
+def run_suicide_prevention_agent(state: State):
+    print("Running suicide prevention agent")
+    concern_model = suicide_prevention_prompt | model
+    response = concern_model.invoke(state["messages"])
+    return {"messages": response}
+
+# def run_suicide_prevention_agent(state):
+#     # Format the suicide prevention prompt with the latest user message
+#     last_message = state["messages"][-1]
+#     formatted_messages = suicide_prevention_prompt.format_messages(input=last_message.content)
     
-    # Combine any prior messages if necessary
-    messages = state["messages"] + formatted_messages
-    response = model.invoke(messages)
-    return {"messages": state["messages"] + [AIMessage(content=response.content)]}
+#     # Combine any prior messages if necessary
+#     messages = state["messages"] + formatted_messages
+#     response = model.invoke(messages)
+#     return {"messages": state["messages"] + [AIMessage(content=response.content)]}
 
 
 def summarize_conversation(state):
@@ -164,39 +190,41 @@ def should_continue(state):
 workflow = StateGraph(State)
 
 # Add nodes
-workflow.add_node("router", route_query)
+# workflow.add_node("router", route_query)
 workflow.add_node("conversational", run_conversational_agent)
 workflow.add_node("suicide_prevention", run_suicide_prevention_agent)
 workflow.add_node("summarize_conversation", summarize_conversation)
-workflow.add_node("should_continue", should_continue)
+# workflow.add_node("should_continue", should_continue)
 
 # Define edges and conditional edges
-workflow.add_edge(START, "router")
+# workflow.add_edge(START, "router")
 workflow.add_conditional_edges(
-    "router",
+    START,
     route_query,
     {
         "conversational": "conversational",
         "suicide_prevention": "suicide_prevention"
-    }
+    },
 )
 workflow.add_conditional_edges(
     "conversational",
     tools_condition,
     {
-        "continue": "should_continue",
-        "tools": "conversational"
+        # "continue": "should_continue",
+        "tools": "conversational",
+        "conversational":"conversational"
     }
 )
-workflow.add_conditional_edges(
-    "should_continue",
-    should_continue,
-    {
-        "summarize_conversation": "summarize_conversation",
-        "conversational": "conversational",
-        "end": END
-    }
-)
+# workflow.add_conditional_edges(
+#     "should_continue",
+#     should_continue,
+#     {
+#         "summarize_conversation": "summarize_conversation",
+#         "conversational": "conversational",
+#         "end": END
+#     }
+# )
+workflow.add_edge("conversational", END)
 workflow.add_edge("suicide_prevention", END)
 workflow.add_edge("summarize_conversation", "conversational")
 
@@ -206,6 +234,7 @@ graph = workflow.compile(checkpointer=memory)
 
 # Function to run a conversation turn
 def chat(message: str, config: dict):
+    print("User:", message)
     msg = HumanMessage(content=message)
     # print(msg)
     result = graph.invoke({"messages": [msg]}, config=config)

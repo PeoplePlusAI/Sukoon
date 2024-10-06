@@ -1,31 +1,26 @@
-from langgraph.graph import MessagesState, StateGraph, START, END
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from pydantic import BaseModel, Field
+from langgraph.graph.message import AnyMessage, add_messages
+from typing import Literal, Annotated
 from langchain_core.prompts import ChatPromptTemplate
-from langgraph.prebuilt import tools_condition, ToolNode
+from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.tools import tool
 from typing import TypedDict, List
-import os
-
-from llama_index.core import (
-    VectorStoreIndex,
-    SimpleDirectoryReader,
-    StorageContext,
-    load_index_from_storage,
-)
+from openai import OpenAI
+import os 
+from langchain_openai import ChatOpenAI
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-openai_api_key = os.getenv("OPENAI_API_KEY")
-LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
-
 # Define the state
 class State(TypedDict):
-    messages: List[HumanMessage | AIMessage]
+    messages: Annotated[list[AnyMessage], add_messages]
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 # Initialize OpenAI model
+# model = llm
 model = ChatOpenAI(model="gpt-4o", temperature=0.7)
 
 # Define prompts
@@ -44,53 +39,49 @@ suicide_prevention_prompt = ChatPromptTemplate.from_messages([
     ("human", "{input}"),
 ])
 
-# Define node functions
+# Define router
 def route_query(state: State):
-    messages = state["messages"]
-    last_message = messages[-1]
-    
-    response = model.invoke([planner_prompt.format(input=last_message.content)])
-    return response.content.strip().lower()
+    class RouteQuery(BaseModel):
+          """Route a user query to the most relevant node."""
+          route: Literal["conversational", "suicide_prevention"] = Field(
+              ...,
+              description="Given a user question choose to route it to normal conversation or a suicide prevention.",
+          )
+    structured_llm_router = model.with_structured_output(RouteQuery)
+    question_router = planner_prompt | structured_llm_router
+    last_message = state["messages"][-1]
+    resp = question_router.invoke({"input": last_message})
+    return resp.route
 
 def run_conversational_agent(state: State):
-    response = model.invoke([conversational_prompt] + state["messages"])
-    return {"messages": state["messages"] + [AIMessage(content=response.content)]}
+    print("Running conversational agent")
+    convo_model = conversational_prompt | model
+    response = convo_model.invoke(state["messages"])
+    return {"messages": response}
 
 def run_suicide_prevention_agent(state: State):
-    response = model.invoke([suicide_prevention_prompt] + state["messages"])
-    return {"messages": state["messages"] + [AIMessage(content=response.content)]}
-
-def should_continue(state: State):
-    if len(state["messages"]) > 15:
-        return "end"
-    return "router"
+    print("Running suicide prevention agent")
+    concern_model = suicide_prevention_prompt | model
+    response = concern_model.invoke(state["messages"])
+    return {"messages": response}
 
 # Create the graph
 workflow = StateGraph(State)
 
 # Add nodes
-workflow.add_node("router", route_query)
 workflow.add_node("conversational", run_conversational_agent)
 workflow.add_node("suicide_prevention", run_suicide_prevention_agent)
 
 # Add edges
-workflow.add_edge(START, "router")
 workflow.add_conditional_edges(
-    "router",
-    lambda x: x,
-    {
+    START,
+    route_query,
+     {
         "conversational": "conversational",
         "suicide_prevention": "suicide_prevention"
-    }
+     },
 )
-workflow.add_conditional_edges(
-    "conversational",
-    should_continue,
-    {
-        "router": "router",
-        "end": END
-    }
-)
+workflow.add_edge("conversational", END)
 workflow.add_edge("suicide_prevention", END)
 
 # Compile the graph
@@ -99,15 +90,14 @@ graph = workflow.compile(checkpointer=memory)
 
 # Function to run a conversation turn
 def chat(message: str, config: dict):
+    print("User:", message)
     result = graph.invoke({"messages": [HumanMessage(content=message)]}, config=config)
     return result["messages"][-1]
 
-# Example usage
-if __name__ == "__main__":
-    config = {"configurable": {"thread_id": "test"}}
-    
-    response = chat("Hi! I'm feeling really stressed about my exams", config)
-    print("Bot:", response.content)
-    
-    response = chat("I don't know if I can handle this stress anymore", config)
-    print("Bot:", response.content)
+config = {"configurable": {"thread_id": "test"}}
+
+response = chat("Hi! I'm feeling really stressed about my exams", config)
+print("Bot:", response.content)
+
+response = chat("I don't know if I can handle this stress anymore", config)
+print("Bot:", response.content)

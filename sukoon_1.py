@@ -7,6 +7,8 @@ from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.tools import tool
 from typing import TypedDict
 import os
+import yaml
+from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders
 
 from llama_index.core import (
     VectorStoreIndex,
@@ -20,14 +22,27 @@ _ = load_dotenv(find_dotenv())
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 LANGCHAIN_API_KEY = os.getenv("LANGCHAIN_API_KEY")
-
+# PORTKEY_API_KEY = os.getenv("PORTKEY_API_KEY")
+# VIRTUAL_KEY = os.getenv("PORTKEY_VIRTUAL_KEY")
+ANTHROPIC_KEY =  os.getenv("ANTHROPIC_API_KEY")
 # Define the state
 class State(MessagesState):
     summary: str = ""
 
 # Initialize OpenAI model
-model = ChatOpenAI(model="gpt-4o", temperature=0.7)
+model = ChatOpenAI(model="gpt-4o", temperature=0.7) # model = 'claude-sonnet-3.5'
 
+# from portkey_ai import Portkey
+# portkey = Portkey(
+#     api_key=PORTKEY_API_KEY,
+#     virtual_key=VIRTUAL_KEY
+# )
+
+def load_prompts(file_path='prompts.yaml'):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
+
+prompts = load_prompts()
 # Define the llama_index tool
 def llama_index(query: str):
     """Use this tool to retrieve relevant information from the knowledge base."""
@@ -58,13 +73,15 @@ planner_prompt = ChatPromptTemplate.from_messages([
 
 # Empathetic Conversational Agent
 conversational_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are an empathetic conversational agent. Provide supportive responses to help relieve student stress. Use the llama_index tool if needed to retrieve relevant information."),
+    # ("system", "You are an empathetic conversational agent. Provide supportive responses to help relieve student stress. Use the llama_index tool if needed to retrieve relevant information."),
+    ("system", prompts['empathetic_agent_prompt']),
     ("human", "{input}"),
 ])
 
 # Suicide Prevention Agent
 suicide_prevention_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a suicide prevention agent. Apply QPR (Question, Persuade, Refer) techniques and refer to trained professionals or suicide prevention helpline. Be extremely cautious and supportive."),
+    # ("system", "You are a suicide prevention agent. Apply QPR (Question, Persuade, Refer) techniques and refer to trained professionals or suicide prevention helpline. Be extremely cautious and supportive."),
+    ("system", prompts['suicide_prevention_agent_prompt']),
     ("human", "{input}"),
 ])
 

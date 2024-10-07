@@ -9,6 +9,7 @@ from typing import TypedDict, List
 from openai import OpenAI
 import os 
 from langchain_openai import ChatOpenAI
+import yaml
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
@@ -18,7 +19,11 @@ class State(TypedDict):
     messages: Annotated[list[AnyMessage], add_messages]
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
+def load_prompts(file_path='../prompts.yaml'):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
 
+prompts = load_prompts()
 # Initialize OpenAI model
 # model = llm
 model = ChatOpenAI(model="gpt-4o", temperature=0.7)
@@ -30,12 +35,12 @@ planner_prompt = ChatPromptTemplate.from_messages([
 ])
 
 conversational_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are an empathetic conversational agent. Provide supportive responses to help relieve student stress."),
+    ("system", prompts['empathetic_agent_prompt']),
     ("human", "{input}"),
 ])
 
 suicide_prevention_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a suicide prevention agent. Apply QPR (Question, Persuade, Refer) techniques and refer to trained professionals or suicide prevention helpline. Be extremely cautious and supportive."),
+    ("system", prompts['suicide_prevention_agent_prompt']),
     ("human", "{input}"),
 ])
 
@@ -90,14 +95,18 @@ graph = workflow.compile(checkpointer=memory)
 
 # Function to run a conversation turn
 def chat(message: str, config: dict):
-    print("User:", message)
+    # print("User:", message)
     result = graph.invoke({"messages": [HumanMessage(content=message)]}, config=config)
     return result["messages"][-1]
 
-config = {"configurable": {"thread_id": "test"}}
-
-response = chat("Hi! I'm feeling really stressed about my exams", config)
-print("Bot:", response.content)
-
-response = chat("I don't know if I can handle this stress anymore", config)
-print("Bot:", response.content)
+if __name__ == "__main__":
+    config = {"configurable": {"thread_id": "1"}}
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit"]:
+            print("Bot: Goodbye!")
+            break
+        # response = chat("Hi! I'm feeling really stressed about my exams", config)
+        # print("Bot:", response.content)
+        response = chat(user_input, config)
+        print("Sukoon:", response.content)

@@ -117,13 +117,13 @@ def route_query(state: State):
 def run_conversational_agent(state):
     summary = state.get("summary", "")
     if summary:
-        # Include the summary as a system message
+        # Include the summary as a system message.
         system_message = SystemMessage(content=f"Summary of conversation earlier: {summary}")
         messages = [system_message] + state["messages"]
     else:
         messages = state["messages"]
     
-    # Format the conversational prompt with the latest user message
+    # Format the conversational prompt with the latest user message.
     last_message = state["messages"][-1]
     formatted_messages = conversational_prompt.format_messages(input=last_message.content)
     

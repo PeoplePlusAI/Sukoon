@@ -1,6 +1,14 @@
 # Project Sukoon: Mental Health Support using AI
 <img src="archive/sukoon_pic.png" alt="Sukoon Pic" width="200" style="display: block; margin: 0 auto;">
 
+## Open Roles for Tech Tasks 
+
+- [ ] Agent Building - help us build and refine current agents being used
+- [ ] Agent Testing - help us do thorough testing of agents and workflow
+- [ ] Evals - Improved accuracy and efficiency of the evaluation pipeline.
+- [ ] Contribute in curating datasets and/or LLM Prompt Finetuning
+- [ ] UI/UX improvements 
+      
 ## Table of Contents
 
 - [Vision](#vision)

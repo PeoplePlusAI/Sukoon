@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import time
 import logging
+import requests
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -99,3 +100,24 @@ def generate_response(message_body, wa_id, name):
     new_message = run_assistant(thread, name)
 
     return new_message
+
+def generate_langgraph_response(message_body):
+    # Prepare the data to send in the POST request
+    data = {
+        "input": message_body  # Sending message_body as input
+    }
+
+    # URL to which the POST request will be sent
+    url = "http://127.0.0.1:8001/query"
+
+    # Send the POST request with the data
+    response = requests.post(url, json=data)
+
+    # Check the response status and handle accordingly
+    if response.status_code == 200:
+        res_message = response.json()
+        new_message = res_message["full_output"]["agent_out"]["output"]
+        return new_message
+    else:
+        # Handle errors (if any)
+        return f"Error: Received status code {response.status_code}"

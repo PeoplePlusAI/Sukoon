@@ -3,7 +3,7 @@ from flask import current_app, jsonify
 import json
 import requests
 
-from app.services.openai_service import generate_response
+from app.services.openai_service import generate_response, generate_langgraph_response
 import re
 
 def log_http_response(response):
@@ -87,8 +87,13 @@ def process_whatsapp_message(body):
     # response = generate_response(message_body)
 
     # OpenAI Integration
-    response = generate_response(message_body, wa_id, name)
+    """ response = generate_response(message_body, wa_id, name)
+    response = process_text_for_whatsapp(response) """
+
+    # LangGraph INtegration
+    response = generate_langgraph_response(message_body)
     response = process_text_for_whatsapp(response)
+
 
     data = get_text_message_input(current_app.config["RECIPIENT_WAID"], response)
     send_message(data)

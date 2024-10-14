@@ -14,4 +14,4 @@ langgraph-sdk
 llama-index
 fastapi
 uvicorn
-
+pytest

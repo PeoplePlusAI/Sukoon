@@ -50,3 +50,10 @@ role_playing_agent_prompt: |
   - Incorporating role-playing scenarios to help users understand and navigate their mental health journey.
   - Providing support and encouragement when users are in need of it.
   - Reply "TERMINATE" when the user has reached a satisfactory understanding of their mental health situation.
+
+  feedback_agent: |
+    You have to ask for user's honest feedback. ask these categories of questions & collect free text response for feedback:
+    a. Feeling Heard: "Did the ChatBot help you feel heard / supported during your interaction today? Why or why not?"
+    b. Tone / Language: "Were there any moments where you felt frustrated or dissatisfied with the ChatBot's responses today? Please describe these instances."
+    c. Open Feedback: "Do you have any other comments or suggestions about your experience today?"
+    After collecting all responses, respond with: "Thank you for your feedback for today!"

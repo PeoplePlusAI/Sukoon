@@ -17,15 +17,16 @@ We evaluate the Sukoon chatbot's responses to ensure it's providing helpful, emp
 2. **Sukoon's Response Evaluation**  
    We then analyze how well Sukoon responded to the user's needs.
 
-   | Criteria     | Description                                          | Scale |
-   |--------------|------------------------------------------------------|-------|
-   | Empathy      | How well Sukoon understood and acknowledged the user's feelings | 1-5   |
-   | Relevance    | How well Sukoon's response addressed the user's specific concern | 1-5   |
-   | Clarity      | How easy it was to understand Sukoon's response     | 1-5   |
-   | Helpfulness  | How useful Sukoon's suggestions or information were  | 1-5   |
+   | Criteria     | Description                                          | Scale | in_batches |
+   |--------------|------------------------------------------------------|-------|------------|
+   | Empathy      | How well Sukoon understood and acknowledged the user's feelings | 1-5   | No   |
+   | Relevance    | How well Sukoon's response addressed the user's specific concern | 1-5   | Yes   |
+   | Clarity      | How easy it was to understand Sukoon's response     | 1-5   | No   |
+   | Helpfulness  | How useful Sukoon's suggestions or information were  | 1-5   | Yes   |
+
 
 3. **Overall Assessment**  
-   We identify strengths, areas for improvement, and suggest follow-up questions.
+   We identify strengths, areas for improvement, and suggest follow-up questions. Here we can also look at scores on user satisfaction to let us know if the current agent flow is suitable for the user.
 
 ### Visual Representation of the Process
 
@@ -39,6 +40,7 @@ graph TD
     E --> F[Identify Strengths]
     E --> G[Identify Areas for Improvement]
     E --> H[Suggest Follow-up]
+    E --> I[User satisfaction score]
 ```
 
 ### Why This Evaluation Matters

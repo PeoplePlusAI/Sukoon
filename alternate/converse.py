@@ -2,7 +2,7 @@ import openai
 import os
 import time
 
-client = openai.OpenAI(api_key="sk-proj-If7SKDdQbA1nHIeZfRyYT3BlbkFJTaFyceLNDnp6zTaJ0yiv")
+client = openai.OpenAI(api_key)
 
 # Create a math tutor assistant (you can modify this depending on the assistant's function)
 assistant = client.beta.assistants.create(

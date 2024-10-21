@@ -116,7 +116,7 @@ def generate_langgraph_response(message_body):
     # Check the response status and handle accordingly
     if response.status_code == 200:
         res_message = response.json()
-        new_message = res_message["full_output"]["agent_out"]["output"]
+        new_message = res_message["output"]
         return new_message
     else:
         # Handle errors (if any)

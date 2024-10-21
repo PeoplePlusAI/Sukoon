@@ -21,7 +21,7 @@ function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/query', {
+      const response = await fetch('http://127.0.0.1:8001/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,7 +30,8 @@ function App() {
       });
 
       const data = await response.json();
-      setMessages(prevMessages => [...prevMessages, { text: data.full_output.agent_out.output, user: false }]);
+      // console.log(data)
+      setMessages(prevMessages => [...prevMessages, { text: data.output, user: false }]);
     } catch (error) {
       console.error('Error:', error);
     } finally {

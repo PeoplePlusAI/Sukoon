@@ -1,18 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Optional, TypedDict, Annotated
-from langgraph.graph import StateGraph, START, END
-from langgraph.graph.message import AnyMessage, add_messages
-from langgraph.checkpoint.memory import MemorySaver
+from typing import TypedDict, Annotated
 import uvicorn
-import json
-from typing import List, Optional, Dict, Any
-from pprint import pformat
-from langchain_core.agents import AgentAction, AgentFinish
-
-# Define the state
-class State(TypedDict):
-    messages: Annotated[list[AnyMessage], add_messages]
 
 from sukoon import chat
 
@@ -35,7 +24,7 @@ class SukoonRequest(BaseModel):
 class SukoonResponse(BaseModel):
     output: str
 
-@app.get("/query", response_model = SukoonResponse)
+@app.post("/query", response_model = SukoonResponse)
 async def process_query(request: SukoonRequest):
     config = {"configurable": {"thread_id":"1"}}
     user_input = request.input

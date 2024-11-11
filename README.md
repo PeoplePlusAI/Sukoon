@@ -1,126 +1,105 @@
-# Project Sukoon: Mental Health Support using AI
-<img src="archive/sukoon_logo.png" alt="Sukoon Pic" width="200" style="display: block; margin: 0 auto;">
+# Project Sukoon 🌟
+> Mental Health Support using AI
 
-## Open Roles for Tech Tasks 
+<div align="center">
+  <img src="docs/assets/sukoon_logo.png" alt="Sukoon Logo" width="200">
+  <p>Made for 🇮🇳 with ❤️ by People+AI</p>
+</div>
 
-- [ ] Agent Building - help us build and refine current agents being used
-- [ ] Agent Testing - help us do thorough testing of agents and workflow
-- [ ] Evals - Improved accuracy and efficiency of the evaluation pipeline.
-- [ ] Contribute in curating datasets and/or LLM Prompt Finetuning
-- [ ] UI/UX improvements 
-      
-## Table of Contents
+[![CI/CD](https://github.com/yourusername/sukoon/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/yourusername/sukoon/actions/workflows/ci-cd.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-- [Vision](#vision)
-- [Project Progress](#project-progress)
-- [Installation](#installation)
-- [Contributing](#contributing)
-- [Documentation](#documentation)
-- [Issues](#issues)
-- [Pull Requests](#pull-requests)
-- [Volunteer](#volunteer)
+## 🎯 Vision
 
-## Vision
+Project Sukoon aims to build open-source solutions and standards for using AI to address mental health challenges in India. Our goal is to apply Digital Public Infrastructure (DPI) knowledge and practices to help professionals explore and understand the latest advancements in AI and their applications to mental health use-cases specific to India.
 
-Project Sukoon aims to build open-source solutions and standards for using AI to address mental health challenges. Our goal is to apply Digital Public Infrastructure (DPI) knowledge and practices to help professionals explore and understand the latest advancements in AI and their applications to mental health use-cases specific to India.
+## 🚀 Features
 
-## 🚀 Project Progress
+- Multi-agent AI system for mental health support
+- Support for multiple Indian languages
+- Privacy-focused architecture
+- WhatsApp integration
+- Web interface
+- Evaluation pipeline
 
-1. Prototyped with [Crew AI agent framework](https://www.crewai.com/)
-2. Developed backend and frontend using [LangGraph framework](https://www.langchain.com/langgraph)
-3. Shifted to [AutoGen framework](https://microsoft.github.io/autogen/docs/tutorial/introduction/) based on expert consultation
-4. Currently addressing web UI issues and agent loop problems with AutoGen
-5. Planning to create API endpoints for LangGraph and integrate with WhatsApp API
-6. Iterated and added more agents to the pipeline
+## 🛠️ Technical Architecture
+![Technical Architecture](docs/assets/tech_arch_latest.png)
 
-[Watch the video](https://drive.google.com/file/d/1zFL8nz0d8aqzHxJhFU0h-ScDdFaSkPeT/view?usp=drive_link)
+## 🏃 Quick Start
 
-## Installation
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- OpenAI API key
+- LangChain API key
 
-### Technical Architecture
-![Technical Architecture](archive/tech_arch_latest.png)
+### Installation
 
-This is Langgraph code. Code from AutoGen is in different branch.
+1. Clone the repository:
+bash
+git clone https://github.com/yourusername/sukoon.git
+cd sukoon
 
-# LangGraph (Current Version)
-```
-- Go to langgraph branch
-- install all dependencies in your environment (pip install -r requirements.txt)
-- run 'python sukoon_api.py' 
-- go to sukoon-frontend(cd sukoon-frontend), run 'npm start' to access it in your browser.
-- alternatively use this vercel deployment to access it - https://sukoon-1.vercel.app
-```
 
-## Steps to add environment variables - 
-Create a .env file with:
-```
-OPENAI_API_KEY = '<YOUR_OPENAI_API_KEY>' 
-LANGCHAIN_API_KEY = '<YOUR_LANGCHAIN_API_KEY>'
-```
-- Alternatively , try this:
-```
-On Mac/Linux -
-export OPENAI_API_KEY=your_api_key_here
+2. Set up environment variables:
 
-On Windows -
-setx OPENAI_API_KEY "your_api_key_here"
-```
+bash
+cp .env.example .env
+Edit .env with your API keys
 
-# How to contribute 🤝
-There are few ways you can contribute to Sukoon
 
-- By providing feedback on the POC
-- By helping in testing and evaluation(please find relevant code in `tests` and `evals` folder)
-- By raising issues in the issues section
-- By contributing to the codebase based on the issues
-- Join the Sukoon team by filling the p+ai volunteer form ([https://peopleplus.ai/volunteer](https://coda.io/form/Volunteer-with-Us_dU44lQvPaxK?Type%20of%20Person=Volunteer&POC=David%20Menezes)) and select the Sukoon project.
-- Submit PRs to the respective branches (e.g. 'icg' or 'langgraph')
+3. Install dependencies:
+bash
+pip install -r requirements.txt
+cd src/frontend && npm install
 
-For detailed guidelines, please read the guidelines outlined in CONTRIBUTING.md
 
-The docs folder contains overall project documentation and related documents. To access or contribute to the documentation, please refer to docs/README.md.
-e.g Please read the main doc here and feel free to add comments here - https://docs.google.com/document/d/1H8-oJmMy0r28kYup9vqt8VGDlY_cCFW_2M07XJxWpFU/edit?usp=sharing 
+4. Run the application:
+bash
+Backend
+python src/backend/main.py
+Frontend
+cd src/frontend && npm start
 
-## Issues
 
-If you encounter any issues with the project, please create a new issue using the issue template. Provide as much detail as possible to help us understand and resolve the issue.
+## 🤝 Contributing
 
-# Current Challenges
-We have three active discussions:
-```
-Develop a PII Removal Module
-Optimizing Sukoon's Evaluation Pipeline
-Improving Central Orchestrator Agent Classification in AutoGen System
-```
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-# Current Landscape
+### Open Roles [open-roles](https://coda.io/@peopleplusai/people-ai-projects)
+- [ ] Agent Building
+- [ ] Agent Testing
+- [ ] Evaluation Pipeline
+- [ ] Dataset Curation
+- [ ] UI/UX Improvements
+
+## 📚 Documentation
+
+- [API Documentation](docs/api/README.md)
+- [Architecture Guide](docs/architecture/README.md)
+- [Development Guide](docs/guides/development.md)
+- [Deployment Guide](docs/guides/deployment.md)
+
+## 🌍 Current Landscape
+
 Mental health support in India faces several challenges:
+- Stigma and discrimination
+- Lack of awareness
+- Shortage of trained personnel
+- Affordability issues
+- Low budget allocation
 
-* Stigma and discrimination
-* Lack of awareness
-* Shortage of trained mental healthcare personnel
-* Affordability issues
-* Low budget allocation for mental healthcare
+## 🔮 Future Vision
 
-# What could a solution look like? (Future Vision) 
-* Very personal approach with focus on listening and emphasising
-* Available in 22 Indic regional languages, especially on mobile devices
-* Stores the user conversation locally, not on cloud -> ensuring complete privacy
-* Will provide helpful resources for most common mental health problems. However, it'll not prescribe any medicines
-* For training the bot , we can use federated learning
-* Will be available as an API, so interested people can try this and build on top of it, based on their use case
-* Aim is to get national-level adoption
-* If serious, there’ll option to reach out to a psychiatrist or support community groups e.g. peer to peer network
-* Have L1/L2/L3 level of support 
+- Support for 22 Indic languages
+- Local data storage for privacy
+- Federated learning implementation
+- National-level adoption
+- Tiered support system (L1/L2/L3)
 
-# Some interesting ideas to try: 
-* Can we gamify the whole conversation? If yes, then how? 
-* Can we nudge users to adopt emotionally healthier behaviour? 
-* In particular, we can warn users about what not to do - relying on superstitions, isolation, labelling, and other unhelpful tactics
-* Give positive self-affirmation, create safety plan, etc
-* Can we develop Emotional Intelligence that understands not just emotions, but context behind it
-* Can we detect emotional status ike stress level using voice and then provide support
-* Can we create a timeline tracker let’s say six month plan for meditation and track streak
-* Can we give them a phone number they can call to? The bot will mainly listen , empathize and offer safe advice
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 “Made for 🇮🇳 with ❤️ by People+AI”

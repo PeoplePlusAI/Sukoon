@@ -1,3 +1,7 @@
 version https://git-lfs.github.com/spec/v1
 oid sha256:ab4bd48a10f4dc60ae2cad999e9135e2ac7073651b52d2638f1fca4d26c92b6f
 size 3384
+*.pyc
+.DS_Store
+docs/user_research/.DS_Store
+docs/user_research/sukoon_persona.jpg
